@@ -1,0 +1,316 @@
+@use "sass:color";
+
+/* ===== Tokens ===== */
+$clinic-teal: #0f9c9c;
+$clinic-gray: #3f4149;
+$clinic-light-gray: #6d7280;
+$bg-grad-left: #c9f1f1;
+$bg-grad-mid: rgba(232, 253, 255, 0.47);
+
+$icon-bg-blue: #e9f1ff;
+$icon-bg-yellow: #fff7e0;
+$icon-bg-green: #e9fff5;
+
+$page-max: 1289px;
+$shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
+
+/* ===== Animations / helpers ===== */
+@keyframes bob {
+
+    0%,
+    100% {
+        transform: translateY(0)
+    }
+
+    50% {
+        transform: translateY(-4px)
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px)
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
+/* Disable animations for reduced-motion users */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important
+    }
+}
+
+/* ===== Page ===== */
+.page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    padding: clamp(24px, 4vw, 28px) clamp(24px, 6vw, 56px);
+    background: linear-gradient(90deg, $bg-grad-left, $bg-grad-mid, $bg-grad-mid);
+}
+
+.container {
+    width: 100%;
+    max-width: $page-max;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ===== Typography ===== */
+.title {
+    width: 100%;
+    margin: 0 0 clamp(16px, 3vw, 20px);
+    text-align: center;
+    color: $clinic-teal;
+    font-family: "GFS Didot", serif;
+    font-weight: 400;
+    line-height: 1.2;
+    font-size: clamp(28px, 6vw, 40px);
+    text-transform: capitalize;
+}
+
+.subtitle {
+    margin: 0 0 clamp(8px, 2vw, 10px);
+    color: $clinic-gray;
+    font-family: "GFS Didot", serif;
+    font-weight: 400;
+    font-size: clamp(24px, 7vw, 48px);
+    line-height: 1.1;
+}
+
+.lede {
+    color: $clinic-light-gray;
+    font-family: "Geologica", system-ui, sans-serif;
+    font-weight: 400;
+    font-size: clamp(18px, 4.5vw, 32px);
+    line-height: clamp(28px, 7vw, 50px);
+}
+
+/* ===== Layout ===== */
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(20px, 4vw, 40px);
+    width: 100%;
+
+    @media (min-width: 1024px) {
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 40px;
+    }
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(14px, 3vw, 28px);
+    width: 100%;
+    animation: fadeUp .35s ease both;
+
+    @media (min-width: 1024px) {
+        width: 673px;
+        /* design lock */
+        flex-shrink: 0;
+    }
+}
+
+.right {
+    width: 100%;
+
+    @media (min-width: 1024px) {
+        width: 616px;
+        flex-shrink: 0;
+    }
+}
+
+/* ===== Cards (mobile grid) ===== */
+.cardsMobile {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+
+    @media (min-width: 560px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1024px) {
+        display: none;
+    }
+}
+
+/* Base card */
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: $shadow-card;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; // hug content
+    gap: 14px; // space between icon and text
+    width: auto;
+    height: auto; // auto-resize to content
+}
+
+/* hover tilt accent */
+.cardHover {
+    transform-style: preserve-3d;
+    transition: transform .25s ease, box-shadow .25s ease;
+    will-change: transform, box-shadow;
+
+    &:hover {
+        box-shadow: 0 22px 60px -10px rgba(0, 0, 0, .12);
+    }
+}
+
+/* Icon holders */
+.iconWrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+
+    &.blue {
+        background: $icon-bg-blue;
+    }
+
+    &.yellow {
+        background: $icon-bg-yellow;
+    }
+
+    &.green {
+        background: $icon-bg-green;
+    }
+}
+
+/* Icon bob (subtle) */
+.iconBob {
+    animation: bob 3.2s ease-in-out infinite;
+
+    svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.cardText {
+    text-align: center;
+    color: $clinic-gray;
+    font-family: "Poppins", system-ui, sans-serif;
+    font-weight: 400;
+    font-size: clamp(15px, 3.5vw, 17px);
+    line-height: 1.4;
+}
+
+/* ===== Cards (desktop absolute composition) ===== */
+.cardsDesktop {
+    display: none;
+
+    @media (min-width: 1024px) {
+        display: block;
+        position: relative;
+        width: 616px;
+        height: 758px;
+        perspective: 900px;
+        /* for hover tilt depth */
+    }
+}
+
+.card1,
+.card2,
+.card3,
+.card4 {
+    position: absolute;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: $shadow-card;
+}
+
+/* positions per design */
+.card1 {
+    left: 26px;
+    top: -2px;
+    width: 279px;
+    height: 325px;
+}
+
+.card2 {
+    right: 26px;
+    top: 20px;
+    width: 250px;
+    height: 350px;
+}
+
+.card3 {
+    left: 34px;
+    top: 342px;
+    width: 259px;
+    height: 371px;
+}
+
+.card4 {
+    right: 33px;
+    top: 425px;
+    width: 244px;
+    height: 305px;
+}
+
+/* inner variants */
+.cardInner {
+    width: 100%;
+    height: 100%;
+    padding: 39px 18px;
+    display: grid;
+    align-content: start;
+    gap: 20px;
+}
+
+.iconRaised {
+    margin-top: -30px;
+}
+
+.cardInnerAlt {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-top: 52px;
+}
+
+.iconFloat {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -26px;
+}
+
+.cardBottomPad {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 23px 44px;
+    display: flex;
+    justify-content: center;
+}
+
+.cardCenter {
+    width: 100%;
+    height: 100%;
+    padding: 40px 19px 40px 22px;
+    display: grid;
+    place-items: center;
+    gap: 37px;
+}

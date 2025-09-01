@@ -1,4 +1,4 @@
-import React from "react";
+
 import styles from "./TimePicker.module.scss";
 
 export type TimePickerProps = {

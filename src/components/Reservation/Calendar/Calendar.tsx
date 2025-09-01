@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./Calendar.module.scss";
 
 type CalendarProps = {
@@ -19,20 +19,20 @@ export function Calendar({
     onSelect,
     initialDate,
     monthNames = [
-        "JANUARI",
-        "FEBRUARI",
+        "JANVIER",
+        "FÉVRIER",
         "MARS",
-        "APRIL",
-        "MAJ",
-        "JUNI",
-        "JULI",
-        "AUGUSTI",
-        "SEPTEMBER",
-        "OKTOBER",
-        "NOVEMBER",
-        "DECEMBER",
+        "AVRIL",
+        "MAI",
+        "JUIN",
+        "JUILLET",
+        "AOÛT",
+        "SEPTEMBRE",
+        "OCTOBRE",
+        "NOVEMBRE",
+        "DÉCEMBRE",
     ],
-    dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
 }: CalendarProps) {
     const today = useMemo(() => {
         const d = new Date();
