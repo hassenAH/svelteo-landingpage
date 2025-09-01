@@ -1,0 +1,29 @@
+@use "styles/variables" as *;
+@use "styles/mixins" as *;
+
+.features {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr; // phones: single column
+
+    @include respond(sm) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include respond(md) {
+        gap: 20px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.feature {
+    padding: 18px;
+
+    @include respond(md) {
+        padding: 20px;
+    }
+}
+
+.feature p {
+    color: $muted;
+}

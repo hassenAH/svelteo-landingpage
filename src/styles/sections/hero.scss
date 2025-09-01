@@ -1,0 +1,32 @@
+@use "styles/variables" as *;
+@use "styles/mixins" as *;
+
+
+.hero {
+    text-align: center;
+    position: relative;
+
+    .hero__bg {
+        height: 44vh;
+
+        @include respond(md) {
+            height: 60vh;
+        }
+    }
+
+    h1 {
+        margin: 0 0 .5rem;
+    }
+
+    p {
+        margin: 0 auto 1.2rem;
+        max-width: 52ch;
+        padding: 0 4px;
+    }
+
+    .hero__cta {
+        margin-top: .6rem;
+        display: flex;
+        justify-content: center;
+    }
+}

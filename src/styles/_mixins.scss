@@ -1,0 +1,17 @@
+@use "sass:map";
+
+// Breakpoints (mobile-first)
+$bp: (
+    xs: 360px,
+    sm: 480px,
+    md: 768px,
+    lg: 1024px,
+    xl: 1280px
+);
+
+/// Usage: @include respond(md) { ... }
+@mixin respond($key) {
+    @media (min-width: map.get($bp, $key)) {
+        @content;
+    }
+}
