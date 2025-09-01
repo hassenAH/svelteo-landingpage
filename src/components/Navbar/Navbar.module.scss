@@ -1,0 +1,343 @@
+@use "styles/variables" as *;
+@use "styles/mixins" as *;
+@use "sass:color";
+
+/* =========================
+   Motion helpers / keyframes
+   ========================= */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 20px 40px rgba(213, 219, 228, .44);
+    }
+
+    50% {
+        box-shadow: 0 26px 60px rgba(213, 219, 228, .55);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    position: relative;
+    transition: background .25s ease, border-color .25s ease, backdrop-filter .25s ease;
+
+    /* Optional sticky+glass state (toggle .isSticky from React on scroll) */
+    &.isSticky {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, .72);
+        border-bottom: 1px solid rgba(0, 0, 0, .06);
+        backdrop-filter: saturate(140%) blur(10px);
+    }
+}
+
+.nav {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: .75rem;
+
+    @include respond(lg) {
+        grid-template-columns: auto 1fr auto;
+        gap: 1.25rem;
+    }
+}
+
+.logo {
+    img {
+        height: 48px;
+        width: auto;
+        object-fit: contain;
+        transform-origin: left center;
+        transition: transform .25s ease;
+
+        @include respond(md) {
+            height: 64px;
+        }
+
+        @include respond(lg) {
+            height: 80px;
+        }
+
+        /* tiny hover lift on large screens */
+        @include respond(lg) {
+            .header:not(.isSticky) &:hover {
+                transform: translateY(-2px);
+            }
+        }
+    }
+}
+
+/* Desktop “pill” menu */
+.desktopWrap {
+    display: none;
+
+    @include respond(lg) {
+        display: block;
+    }
+}
+
+.menuPill {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .75rem 1rem;
+    border-radius: .75rem;
+    background: #fff;
+    box-shadow: 0 20px 40px rgba(213, 219, 228, .44);
+    overflow-x: auto;
+    will-change: transform, box-shadow;
+    animation: fadeUp .35s ease both;
+
+    @include respond(lg) {
+        gap: 2rem;
+        padding: 1rem 2.5rem;
+    }
+
+    /* soft glow on hover */
+    @media (hover:hover) {
+        &:hover {
+            animation: glowPulse 1.6s ease-in-out infinite;
+        }
+    }
+}
+
+.item {
+    flex: 0 0 auto;
+
+    a {
+        position: relative;
+        font-family: "Poppins", system-ui, sans-serif;
+        font-size: .95rem;
+        white-space: nowrap;
+        color: #535862;
+        text-decoration: none;
+        transition: color .2s ease, transform .2s ease;
+        outline: none;
+
+        /* underline slide-in */
+        &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -6px;
+            height: 2px;
+            background: #111;
+            transform: scaleX(0);
+            transform-origin: right center;
+            transition: transform .25s ease;
+        }
+
+        /* hover/focus states */
+        @media (hover:hover) {
+            &:hover {
+                color: #111;
+                transform: translateY(-1px);
+            }
+        }
+
+        &:focus-visible {
+            color: #111;
+            transform: translateY(-1px);
+        }
+
+        &:hover::after,
+        &:focus-visible::after,
+        &[aria-current="page"]::after {
+            transform: scaleX(1);
+            transform-origin: left center;
+        }
+    }
+}
+
+.icon {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+
+    svg {
+        display: block;
+        height: 20px;
+        width: auto;
+        transition: transform .25s ease, opacity .25s ease;
+    }
+
+    @media (hover:hover) {
+        svg:hover {
+            transform: translateY(-1px) scale(1.02);
+        }
+    }
+}
+
+/* Burger button (mobile only) */
+.burger {
+    justify-self: end;
+    border: 0;
+    background: transparent;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background .2s ease, transform .1s ease;
+
+    @include respond(lg) {
+        display: none;
+    }
+
+    &:active {
+        transform: scale(.96);
+        background: rgba(0, 0, 0, .04);
+    }
+
+    .bar {
+        width: 22px;
+        height: 2px;
+        background: #111;
+        position: relative;
+        transition: .25s;
+
+        &::before,
+        &::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            width: 22px;
+            height: 2px;
+            background: #111;
+            transition: transform .25s, top .25s, opacity .2s, width .2s;
+        }
+
+        &::before {
+            top: -7px;
+        }
+
+        &::after {
+            top: 7px;
+        }
+
+        /* subtle stretch on hover */
+        .burger:hover &::before,
+        .burger:hover &::after {
+            width: 24px;
+        }
+    }
+}
+
+/* toggled (X) state for .bar — class applied from TSX */
+.open {
+    background: transparent !important;
+
+    &::before {
+        top: 0 !important;
+        transform: rotate(45deg);
+    }
+
+    &::after {
+        top: 0 !important;
+        transform: rotate(-45deg);
+    }
+}
+
+.svgIcon {
+    display: block;
+    width: 81px;
+    height: 21px;
+    object-fit: contain;
+    transition: transform .25s ease;
+
+    &:hover {
+        transform: translateY(-2px) scale(1.05);
+    }
+}
+
+/* Mobile drawer + link stagger */
+.drawer {
+    position: absolute;
+    inset: 100% 0 auto 0;
+    display: grid;
+    gap: .75rem;
+    padding: .9rem 1rem;
+    background: rgba(255, 255, 255, .96);
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, .08);
+    backdrop-filter: blur(10px);
+    animation: slideDown .25s ease both;
+
+    a {
+        text-decoration: none;
+        color: #111;
+        font-size: 1rem;
+        padding: .5rem 0;
+        opacity: 0;
+        transform: translateY(6px);
+        animation: fadeUp .28s ease forwards;
+    }
+
+    /* pure-CSS stagger using nth-child delays */
+    a:nth-child(1) {
+        animation-delay: .02s;
+    }
+
+    a:nth-child(2) {
+        animation-delay: .06s;
+    }
+
+    a:nth-child(3) {
+        animation-delay: .10s;
+    }
+
+    a:nth-child(4) {
+        animation-delay: .14s;
+    }
+
+    a:nth-child(5) {
+        animation-delay: .18s;
+    }
+}
+
+.drawerIcon {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: .5rem;
+
+    svg {
+        height: 20px;
+        width: auto;
+        opacity: 0;
+        transform: translateY(6px);
+        animation: fadeUp .28s ease .22s forwards;
+    }
+}
