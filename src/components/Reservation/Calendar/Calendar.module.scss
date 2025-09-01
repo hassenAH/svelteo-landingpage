@@ -1,0 +1,172 @@
+@use "styles/variables" as *;
+@use "styles/mixins" as *;
+@use "sass:color";
+
+$border: #dcdcdc;
+$text: #575963;
+$muted: #7a7f89;
+$primary: #0f9c9c;
+$bg: #ffffff;
+
+.calendar {
+    width: 100%;
+    max-width: 680px;
+    /* wider on large screens */
+    min-height: 436px;
+    background: $bg;
+    border: 1px solid $border;
+    border-radius: 16px;
+    margin: 0 auto;
+    padding: clamp(12px, 3vw, 24px);
+    /* fluid padding */
+    display: grid;
+    grid-template-rows: auto 1px auto 1fr;
+    gap: clamp(10px, 2.4vw, 16px);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    /* stack on very small screens if needed */
+    @media (max-width: 360px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+}
+
+.title {
+    margin: 0;
+    font-family: Poppins, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    /* fluid type */
+    color: $text;
+    letter-spacing: .02em;
+}
+
+.navBtns {
+    display: flex;
+    gap: 8px;
+}
+
+.navBtn {
+    width: clamp(26px, 6vw, 34px);
+    height: clamp(26px, 6vw, 34px);
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: $primary;
+    color: #fff;
+    cursor: pointer;
+    transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
+
+    &:hover {
+        background: color.adjust($primary, $lightness: -6%);
+    }
+
+    &:active {
+        transform: scale(.96);
+    }
+
+    &:focus-visible {
+        outline: 2px solid color.adjust($primary, $lightness: 12%);
+        outline-offset: 2px;
+    }
+}
+
+.chev {
+    width: clamp(8px, 2vw, 10px);
+    height: clamp(12px, 3vw, 14px);
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background: $border;
+}
+
+.weekRow {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: clamp(6px, 2vw, 10px);
+}
+
+.weekCell {
+    text-align: center;
+    font-family: Inter, system-ui, sans-serif;
+    font-size: clamp(11px, 2.5vw, 13px);
+    color: $primary;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: clamp(4px, 1.8vw, 10px);
+}
+
+.cell {
+    aspect-ratio: 1 / 1;
+    min-height: clamp(40px, 10vw, 54px);
+    /* bigger tap targets on mobile */
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: #fff;
+    cursor: pointer;
+    transition: background .15s ease, box-shadow .15s ease, transform .08s ease;
+
+    &:hover {
+        background: #f6f7f9;
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid color.adjust($primary, $lightness: 10%);
+        outline-offset: 2px;
+    }
+}
+
+.dayNum {
+    font-family: Inter, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: clamp(12px, 2.6vw, 14px);
+    color: #000;
+}
+
+.dim {
+    opacity: .45;
+    cursor: default;
+
+    &:hover {
+        background: #fff;
+    }
+}
+
+.today {
+    box-shadow: 0 0 0 2px color.adjust($primary, $lightness: 8%) inset;
+}
+
+.selected {
+    background: $primary;
+
+    .dayNum {
+        color: #fff;
+    }
+}
+
+// CalendarWithTime.module.scss addition (or parent container)
+.wrap {
+    display: grid;
+    gap: 12px;
+    max-width: 720px;
+    margin: 0 auto;
+}
