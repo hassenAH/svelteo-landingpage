@@ -7,10 +7,6 @@ $clinic-light-gray: #6d7280;
 $bg-grad-left: #c9f1f1;
 $bg-grad-mid: rgba(232, 253, 255, 0.47);
 
-$icon-bg-blue: #e9f1ff;
-$icon-bg-yellow: #fff7e0;
-$icon-bg-green: #e9fff5;
-
 $page-max: 1289px;
 $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
 
@@ -27,30 +23,20 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     }
 }
 
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(8px)
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0)
-    }
-}
-
-/* Disable animations for reduced-motion users */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation: none !important;
-        transition: none !important
+        transition: none !important;
     }
 }
 
 /* ===== Page ===== */
 .page {
     width: 100%;
+    min-height: 100%;
     min-height: 100vh;
+    min-height: 100svh;
+    /* mobile address bar safe */
     display: flex;
     padding: clamp(24px, 4vw, 28px) clamp(24px, 6vw, 56px);
     background: linear-gradient(90deg, $bg-grad-left, $bg-grad-mid, $bg-grad-mid);
@@ -114,11 +100,9 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     flex-direction: column;
     gap: clamp(14px, 3vw, 28px);
     width: 100%;
-    animation: fadeUp .35s ease both;
 
     @media (min-width: 1024px) {
         width: 673px;
-        /* design lock */
         flex-shrink: 0;
     }
 }
@@ -147,26 +131,26 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     }
 }
 
-/* Base card */
+/* ===== Base card ===== */
 .card {
-    background: #fff;
+    /* <-- this fills the whole card with your per-card color */
+    background: var(--card-bg, #fff);
     border-radius: 12px;
     box-shadow: $shadow-card;
     padding: 20px 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; // hug content
-    gap: 14px; // space between icon and text
-    width: auto;
-    height: auto; // auto-resize to content
+    justify-content: center;
+    /* center icon & text */
+    gap: 14px;
+    text-align: center;
 }
 
 /* hover tilt accent */
 .cardHover {
     transform-style: preserve-3d;
     transition: transform .25s ease, box-shadow .25s ease;
-    will-change: transform, box-shadow;
 
     &:hover {
         box-shadow: 0 22px 60px -10px rgba(0, 0, 0, .12);
@@ -181,33 +165,22 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     display: grid;
     place-items: center;
     box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
-    flex-shrink: 0;
-
-    &.blue {
-        background: $icon-bg-blue;
-    }
-
-    &.yellow {
-        background: $icon-bg-yellow;
-    }
-
-    &.green {
-        background: $icon-bg-green;
-    }
+    background: rgba(255, 255, 255, .7);
+    /* subtle neutral so the icon is readable on colored cards */
 }
 
-/* Icon bob (subtle) */
 .iconBob {
     animation: bob 3.2s ease-in-out infinite;
 
-    svg {
-        width: 32px;
-        height: 32px;
+    img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        display: block;
     }
 }
 
 .cardText {
-    text-align: center;
     color: $clinic-gray;
     font-family: "Poppins", system-ui, sans-serif;
     font-weight: 400;
@@ -225,7 +198,6 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
         width: 616px;
         height: 758px;
         perspective: 900px;
-        /* for hover tilt depth */
     }
 }
 
@@ -235,8 +207,16 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
 .card4 {
     position: absolute;
     border-radius: 12px;
-    background: #fff;
+    background: var(--card-bg, #fff);
+    /* same variable, same color fill */
     box-shadow: $shadow-card;
+
+    /* keep content centered inside each absolute card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 /* positions per design */
@@ -268,20 +248,24 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     height: 305px;
 }
 
-/* inner variants */
-.cardInner {
+/* inner variants (kept, but centered nicely) */
+.cardInner,
+.cardCenter {
     width: 100%;
     height: 100%;
-    padding: 39px 18px;
-    display: grid;
-    align-content: start;
-    gap: 20px;
+    padding: 32px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
 }
 
 .iconRaised {
     margin-top: -30px;
 }
 
+/* original alt layout preserved */
 .cardInnerAlt {
     position: relative;
     width: 100%;
@@ -293,7 +277,8 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: -26px;
+    top: 14px;
+    /* slight push for better centering feel */
 }
 
 .cardBottomPad {
@@ -304,13 +289,4 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     padding: 0 23px 44px;
     display: flex;
     justify-content: center;
-}
-
-.cardCenter {
-    width: 100%;
-    height: 100%;
-    padding: 40px 19px 40px 22px;
-    display: grid;
-    place-items: center;
-    gap: 37px;
 }
