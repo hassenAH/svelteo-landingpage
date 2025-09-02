@@ -8,6 +8,8 @@ import Steps from "./components/Steps/Steps";
 import Footer from "./components/footer/Footer";
 
 import Section from "./components/Section/Section";
+import SocialFollow from "./components/SocialFollow/SocialFollow";
+import ReserveSession from "./components/ReserveSession/ReserveSession";
 
 export default function App() {
   return (
@@ -25,6 +27,27 @@ export default function App() {
 
       <Section id="steps" parallax={50} retrigger>
         <Steps />
+      </Section>
+
+      <Section id="steps" parallax={50} retrigger>
+        <ReserveSession
+          // optional: customize
+          buttonLabel="Nous appeler" // or "nous appelez" to match your copy
+          phone="+91-88787878787"
+          note="Disponible du lundi au samedi, 9h–19h."
+        />
+      </Section>
+
+      <Section id="SocialFollow" parallax={50} retrigger>
+        <SocialFollow
+          links={[
+            { label: "Facebook", href: "https://facebook.com/", iconSrc: "/icons/facebook.svg" },
+            { label: "Instagram", href: "https://instagram.com/", iconSrc: "/icons/instagram.svg" },
+            { label: "LinkedIn", href: "https://www.linkedin.com/company/", iconSrc: "/icons/linkedin.svg" },
+
+
+          ]}
+        />
       </Section>
 
 

@@ -30,7 +30,8 @@ export default function AboutClinic() {
                 <h1 className={styles.title}>
                     À Propos Sveltéo Clinique Minceur Nice
                 </h1>
-
+                <br />
+                <br />
                 <div className={styles.content}>
                     {/* Left copy */}
                     <div className={styles.left}>
