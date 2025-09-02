@@ -10,6 +10,7 @@ import Footer from "./components/footer/Footer";
 import Section from "./components/Section/Section";
 import SocialFollow from "./components/SocialFollow/SocialFollow";
 import ReserveSession from "./components/ReserveSession/ReserveSession";
+import Hero from "./components/Hero/Hero";
 
 export default function App() {
   return (
@@ -17,6 +18,18 @@ export default function App() {
       <HighlightBanner />
       <Navbar />
 
+      <Section id="hero" parallax={60} retrigger>
+        <Hero
+          fit="fill"
+          slides={[
+            { src: "/images/hero-1.webp", alt: "Cryolipolyse en cabine" },
+            { src: "/images/hero-2.webp", alt: "Soin manuel amincissant" },
+            { src: "/images/hero-3.webp", alt: "Suivi et bilan morphologique" },
+          ]}
+          autoPlayMs={5000} // set 0 to disable
+          cta={{ label: "Prendre rendez-vous", href: "#rendezvous" }}
+        />
+      </Section>
       <Section id="services" parallax={60} retrigger>
         <Services />
       </Section>
