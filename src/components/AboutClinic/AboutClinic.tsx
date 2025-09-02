@@ -2,22 +2,22 @@ import styles from "./AboutClinic.module.scss";
 
 const cards = [
     {
-        image: "/icons/money.png",
+        image: "/icons/morphologie.svg",
         text: "Protocoles personnalisés en fonction de votre morphologie et de vos objectifs.",
         bgColor: "#E0F7FA",
     },
     {
-        image: "/icons/support.png",
+        image: "/icons/Encadrement.svg",
         text: "Encadrement sérieux et accompagnement attentif à chaque étape.",
         bgColor: "#FFF3E0",
     },
     {
-        image: "/icons/investigation.png",
+        image: "/icons/Technologies.svg",
         text: "Technologies efficaces et soins manuels experts pour des résultats visibles.",
         bgColor: "#FFFDE7",
     },
     {
-        image: "/icons/monitoring.png",
+        image: "/icons/Coaching.svg",
         text: "Coaching alimentaire pour ancrer des habitudes durables.",
         bgColor: "#E8F5E9",
     },
@@ -89,15 +89,15 @@ export default function AboutClinic() {
                                 className={`${styles.card} ${styles.card2} ${styles.cardHover}`}
                                 style={{ ["--card-bg" as any]: cards[1].bgColor }}
                             >
-                                <div className={styles.cardInnerAlt}>
-                                    <div className={styles.iconFloat}>
+                                <div className={styles.cardInner}>
+                                    <div className={`${styles.iconWrap} ${styles.iconRaised}`}>
                                         <div className={styles.iconBob}>
                                             <img src={cards[1].image} alt="" width={40} height={40} />
                                         </div>
                                     </div>
-                                    <div className={styles.cardBottomPad}>
-                                        <p className={styles.cardText}>{cards[1].text}</p>
-                                    </div>
+
+                                    <p className={styles.cardText}>{cards[1].text}</p>
+
                                 </div>
                             </article>
 

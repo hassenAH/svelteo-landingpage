@@ -27,7 +27,7 @@ export default function App() {
         <Steps />
       </Section>
 
-      {/* Footer can animate with Framer like we did earlier */}
+
       <Section id="contact" parallax={30} retrigger>
         <Footer
           icons={{
