@@ -1,4 +1,4 @@
-import React from "react";
+
 import styles from "./Footer.module.scss";
 
 type FooterProps = {
@@ -17,7 +17,7 @@ type FooterProps = {
 };
 
 export default function Footer({
-    logoSrc = "https://api.builder.io/api/v1/image/assets/TEMP/aeaebbb5320cf1341f14f0be87ac2539a09f6e38?width=662",
+    logoSrc = "/logo-svelteo.webp",
     clinicName = "Sveltéo Clinic Minceur",
     city = "Nice",
     address = "14 Boulevard Risso, 06300 Nice",

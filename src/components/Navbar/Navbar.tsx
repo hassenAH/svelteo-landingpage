@@ -13,7 +13,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <a href="/" className={styles.logo} aria-label="Sveltéo home">
                     <img
-                        src="https://api.builder.io/api/v1/image/assets/TEMP/db2295f13eeb1803b3512c80e67cf190b559cfd2?width=492"
+                        src="/logo-svelteo.webp"
                         alt="Sveltéo"
                         loading="lazy"
                     />
