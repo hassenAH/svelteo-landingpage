@@ -1,25 +1,4 @@
-import { motion, MotionConfig, type Variants } from "framer-motion";
-
 import styles from "./AboutClinic.module.scss";
-
-const container: Variants = {
-    hidden: { opacity: 0, y: 8 },
-    show: {
-        opacity: 1,
-        y: 0,
-        transition: { duration: 0.45, ease: "easeOut", staggerChildren: 0.08 },
-    },
-};
-
-const item: Variants = {
-    hidden: { opacity: 0, y: 10, scale: 0.98 },
-    show: {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: { duration: 0.4, ease: "easeOut" },
-    },
-};
 
 const cards = [
     {
@@ -46,140 +25,113 @@ const cards = [
 
 export default function AboutClinic() {
     return (
-        <MotionConfig reducedMotion="user">
-            <motion.div
-                className={styles.page}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: false, amount: 0.2 }}
-                variants={container}
-            >
-                <div className={styles.container}>
-                    <motion.h1 className={styles.title} variants={item}>
-                        À Propos Sveltéo Clinique Minceur Nice
-                    </motion.h1>
+        <div className={styles.page}>
+            <div className={styles.container}>
+                <h1 className={styles.title}>
+                    À Propos Sveltéo Clinique Minceur Nice
+                </h1>
 
-                    <div className={styles.content}>
-                        {/* Left copy */}
-                        <motion.div className={styles.left} variants={item}>
-                            <h2 className={styles.subtitle}>Qui sommes-nous ?</h2>
-                            <p className={styles.lede}>
-                                <span>
-                                    Chez Sveltéo Clinic Minceur, nous croyons que chaque personne
-                                    mérite de se sentir bien dans son corps.
-                                </span>
-                                <br />
-                                <span>
-                                    Installé au cœur de Nice, notre centre réunit des technologies
-                                    modernes, des soins manuels experts et un accompagnement
-                                    personnalisé pour vous aider à atteindre vos objectifs minceur.
-                                </span>
-                            </p>
-                        </motion.div>
+                <div className={styles.content}>
+                    {/* Left copy */}
+                    <div className={styles.left}>
+                        <h2 className={styles.subtitle}>Qui sommes-nous ?</h2>
+                        <p className={styles.lede}>
+                            <span>
+                                Chez Sveltéo Clinic Minceur, nous croyons que chaque personne
+                                mérite de se sentir bien dans son corps.
+                            </span>
+                            <br />
+                            <span>
+                                Installé au cœur de Nice, notre centre réunit des technologies
+                                modernes, des soins manuels experts et un accompagnement
+                                personnalisé pour vous aider à atteindre vos objectifs minceur.
+                            </span>
+                        </p>
+                    </div>
 
-                        {/* Right: cards */}
-                        <div className={styles.right}>
-                            {/* Mobile stacked */}
-                            <div className={styles.cardsMobile}>
-                                {cards.map(({ image, text, bgColor }, i) => (
-                                    <motion.article
-                                        key={i}
-                                        className={`${styles.card} ${styles.cardHover}`}
-                                        style={{ ["--card-bg" as any]: bgColor }}
-                                        variants={item}
-                                        whileHover={{ y: -4, rotateX: 1.2, rotateY: -1.2 }}
-                                        transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                                    >
-                                        <div className={styles.iconWrap}>
-                                            <div className={styles.iconBob}>
-                                                <img src={image} alt="" width={40} height={40} />
-                                            </div>
-                                        </div>
-                                        <p className={styles.cardText}>{text}</p>
-                                    </motion.article>
-                                ))}
-                            </div>
-
-                            {/* Desktop absolute layout (kept exactly as your design) */}
-                            <div className={styles.cardsDesktop}>
-                                {/* card 1 */}
-                                <motion.article
-                                    className={`${styles.card} ${styles.card1} ${styles.cardHover}`}
-                                    style={{ ["--card-bg" as any]: cards[0].bgColor }}
-                                    variants={item}
-                                    whileHover={{ y: -6, rotateX: 1.2, rotateY: -1.2 }}
-                                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
+                    {/* Right: cards */}
+                    <div className={styles.right}>
+                        {/* Mobile stacked */}
+                        <div className={styles.cardsMobile}>
+                            {cards.map(({ image, text, bgColor }, i) => (
+                                <article
+                                    key={i}
+                                    className={`${styles.card} ${styles.cardHover}`}
+                                    style={{ ["--card-bg" as any]: bgColor }}
                                 >
-                                    <div className={styles.cardInner}>
-                                        <div className={`${styles.iconWrap} ${styles.iconRaised}`}>
-                                            <div className={styles.iconBob}>
-                                                <img src={cards[0].image} alt="" width={40} height={40} />
-                                            </div>
-                                        </div>
-                                        <p className={styles.cardText}>{cards[0].text}</p>
-                                    </div>
-                                </motion.article>
-
-                                {/* card 2 */}
-                                <motion.article
-                                    className={`${styles.card} ${styles.card2} ${styles.cardHover}`}
-                                    style={{ ["--card-bg" as any]: cards[1].bgColor }}
-                                    variants={item}
-                                    whileHover={{ y: -6, rotateX: 1.2, rotateY: -1.2 }}
-                                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                                >
-                                    <div className={styles.cardInnerAlt}>
-                                        <div className={styles.iconFloat}>
-                                            <div className={styles.iconBob}>
-                                                <img src={cards[1].image} alt="" width={40} height={40} />
-                                            </div>
-                                        </div>
-                                        <div className={styles.cardBottomPad}>
-                                            <p className={styles.cardText}>{cards[1].text}</p>
+                                    <div className={styles.iconWrap}>
+                                        <div className={styles.iconBob}>
+                                            <img src={image} alt="" width={40} height={40} />
                                         </div>
                                     </div>
-                                </motion.article>
+                                    <p className={styles.cardText}>{text}</p>
+                                </article>
+                            ))}
+                        </div>
 
-                                {/* card 3 */}
-                                <motion.article
-                                    className={`${styles.card} ${styles.card3} ${styles.cardHover}`}
-                                    style={{ ["--card-bg" as any]: cards[2].bgColor }}
-                                    variants={item}
-                                    whileHover={{ y: -6, rotateX: 1.2, rotateY: -1.2 }}
-                                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                                >
-                                    <div className={styles.cardInner}>
-                                        <div className={styles.iconWrap}>
-                                            <div className={styles.iconBob}>
-                                                <img src={cards[2].image} alt="" width={40} height={40} />
-                                            </div>
+                        {/* Desktop absolute layout */}
+                        <div className={styles.cardsDesktop}>
+                            <article
+                                className={`${styles.card} ${styles.card1} ${styles.cardHover}`}
+                                style={{ ["--card-bg" as any]: cards[0].bgColor }}
+                            >
+                                <div className={styles.cardInner}>
+                                    <div className={`${styles.iconWrap} ${styles.iconRaised}`}>
+                                        <div className={styles.iconBob}>
+                                            <img src={cards[0].image} alt="" width={40} height={40} />
                                         </div>
-                                        <p className={styles.cardText}>{cards[2].text}</p>
                                     </div>
-                                </motion.article>
+                                    <p className={styles.cardText}>{cards[0].text}</p>
+                                </div>
+                            </article>
 
-                                {/* card 4 */}
-                                <motion.article
-                                    className={`${styles.card} ${styles.card4} ${styles.cardHover}`}
-                                    style={{ ["--card-bg" as any]: cards[3].bgColor }}
-                                    variants={item}
-                                    whileHover={{ y: -6, rotateX: 1.2, rotateY: -1.2 }}
-                                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                                >
-                                    <div className={styles.cardCenter}>
-                                        <div className={styles.iconWrap}>
-                                            <div className={styles.iconBob}>
-                                                <img src={cards[3].image} alt="" width={40} height={40} />
-                                            </div>
+                            <article
+                                className={`${styles.card} ${styles.card2} ${styles.cardHover}`}
+                                style={{ ["--card-bg" as any]: cards[1].bgColor }}
+                            >
+                                <div className={styles.cardInnerAlt}>
+                                    <div className={styles.iconFloat}>
+                                        <div className={styles.iconBob}>
+                                            <img src={cards[1].image} alt="" width={40} height={40} />
                                         </div>
-                                        <p className={styles.cardText}>{cards[3].text}</p>
                                     </div>
-                                </motion.article>
-                            </div>
+                                    <div className={styles.cardBottomPad}>
+                                        <p className={styles.cardText}>{cards[1].text}</p>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article
+                                className={`${styles.card} ${styles.card3} ${styles.cardHover}`}
+                                style={{ ["--card-bg" as any]: cards[2].bgColor }}
+                            >
+                                <div className={styles.cardInner}>
+                                    <div className={styles.iconWrap}>
+                                        <div className={styles.iconBob}>
+                                            <img src={cards[2].image} alt="" width={40} height={40} />
+                                        </div>
+                                    </div>
+                                    <p className={styles.cardText}>{cards[2].text}</p>
+                                </div>
+                            </article>
+
+                            <article
+                                className={`${styles.card} ${styles.card4} ${styles.cardHover}`}
+                                style={{ ["--card-bg" as any]: cards[3].bgColor }}
+                            >
+                                <div className={styles.cardCenter}>
+                                    <div className={styles.iconWrap}>
+                                        <div className={styles.iconBob}>
+                                            <img src={cards[3].image} alt="" width={40} height={40} />
+                                        </div>
+                                    </div>
+                                    <p className={styles.cardText}>{cards[3].text}</p>
+                                </div>
+                            </article>
                         </div>
                     </div>
                 </div>
-            </motion.div>
-        </MotionConfig>
+            </div>
+        </div>
     );
 }

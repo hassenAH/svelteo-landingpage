@@ -10,26 +10,6 @@ $bg-grad-mid: rgba(232, 253, 255, 0.47);
 $page-max: 1289px;
 $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
 
-/* ===== Animations / helpers ===== */
-@keyframes bob {
-
-    0%,
-    100% {
-        transform: translateY(0)
-    }
-
-    50% {
-        transform: translateY(-4px)
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-    }
-}
-
 /* ===== Page ===== */
 .page {
     width: 100%;
@@ -133,7 +113,6 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
 
 /* ===== Base card ===== */
 .card {
-    /* <-- this fills the whole card with your per-card color */
     background: var(--card-bg, #fff);
     border-radius: 12px;
     box-shadow: $shadow-card;
@@ -142,19 +121,13 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* center icon & text */
     gap: 14px;
     text-align: center;
 }
 
-/* hover tilt accent */
 .cardHover {
     transform-style: preserve-3d;
-    transition: transform .25s ease, box-shadow .25s ease;
-
-    &:hover {
-        box-shadow: 0 22px 60px -10px rgba(0, 0, 0, .12);
-    }
+    /* removed transition + transform effects */
 }
 
 /* Icon holders */
@@ -165,13 +138,12 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     display: grid;
     place-items: center;
     box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
-    background: rgba(255, 255, 255, .7);
-    /* subtle neutral so the icon is readable on colored cards */
+    background: rgba(255, 255, 255, 0.7);
 }
 
 .iconBob {
-    animation: bob 3.2s ease-in-out infinite;
 
+    /* removed bob animation */
     img {
         width: 40px;
         height: 40px;
@@ -208,10 +180,8 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     position: absolute;
     border-radius: 12px;
     background: var(--card-bg, #fff);
-    /* same variable, same color fill */
     box-shadow: $shadow-card;
 
-    /* keep content centered inside each absolute card */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -248,7 +218,7 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     height: 305px;
 }
 
-/* inner variants (kept, but centered nicely) */
+/* inner variants */
 .cardInner,
 .cardCenter {
     width: 100%;
@@ -265,7 +235,6 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     margin-top: -30px;
 }
 
-/* original alt layout preserved */
 .cardInnerAlt {
     position: relative;
     width: 100%;
@@ -278,7 +247,6 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     left: 50%;
     transform: translateX(-50%);
     top: 14px;
-    /* slight push for better centering feel */
 }
 
 .cardBottomPad {
