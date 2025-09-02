@@ -1,0 +1,49 @@
+.section {
+
+    /* snap each section nicely */
+    scroll-snap-align: start;
+    scroll-margin-top: 72px;
+    /* if you have a sticky navbar */
+
+}
+
+.content {
+
+    margin: 0 auto;
+
+}
+
+.backplate {
+    position: absolute;
+    inset: -10% 0;
+    background: radial-gradient(60% 50% at 50% 40%, rgba(255, 255, 255, .06), transparent 70%);
+    filter: blur(16px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.headerBand {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    width: min(1100px, 92%);
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .04));
+    z-index: 2;
+}
+
+/* Global smooth behavior */
+:global(html) {
+    scroll-behavior: smooth;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .backplate,
+    .headerBand {
+        display: none;
+    }
+}
