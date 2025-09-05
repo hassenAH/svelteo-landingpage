@@ -107,13 +107,13 @@ export default function Navbar() {
 
                         {/* Social icons */}
                         <li className={styles.icon}>
-                            <motion.a href="https://facebook.com" whileHover={{ y: -1, scale: 1.02 }}>
+                            <motion.a href="https://www.facebook.com/SvelteoNice?locale=fr_FR" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/facebook.svg" alt="Facebook" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="https://instagram.com" whileHover={{ y: -1, scale: 1.02 }}>
+                            <motion.a href="https://www.instagram.com/svelteo_clinic_minceur_nice/" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/instagram.svg" alt="Instagram" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="mailto:info@svelteo.com" whileHover={{ y: -1, scale: 1.02 }}>
+                            <motion.a href="mailto:Nice@svelteo.fr" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/email.svg" alt="Email" className={styles.svgIcon} />
                             </motion.a>
                         </li>
@@ -156,13 +156,13 @@ export default function Navbar() {
                             </motion.a>
                         ))}
                         <div className={styles.drawerIcon}>
-                            <motion.a href="#" >
+                            <motion.a href="https://www.facebook.com/SvelteoNice?locale=fr_FR" >
                                 <img src="/icons/facebook.svg" alt="Facebook" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="#" >
+                            <motion.a href="https://www.instagram.com/svelteo_clinic_minceur_nice/" >
                                 <img src="/icons/instagram.svg" alt="Instagram" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="#" >
+                            <motion.a href="mailto:Nice@svelteo.fr" >
                                 <img src="/icons/email.svg" alt="Email" className={styles.svgIcon} />
                             </motion.a>
                         </div>

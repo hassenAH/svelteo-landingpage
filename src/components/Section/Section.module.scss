@@ -13,14 +13,7 @@
 
 }
 
-.backplate {
-    position: absolute;
-    inset: -10% 0;
-    background: radial-gradient(60% 50% at 50% 40%, rgba(255, 255, 255, .06), transparent 70%);
-    filter: blur(16px);
-    z-index: 1;
-    pointer-events: none;
-}
+
 
 .headerBand {
     position: absolute;
@@ -30,7 +23,7 @@
     width: min(1100px, 92%);
     height: 6px;
     border-radius: 999px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .04));
+
     z-index: 2;
 }
 

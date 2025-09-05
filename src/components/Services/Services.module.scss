@@ -28,12 +28,11 @@
 }
 
 .title {
-    font-family: "GFS Didot", serif;
-    color: #50bdc5;
-    font-size: 2.5rem;
-    font-weight: 400;
-    line-height: 1.2;
-    text-transform: capitalize;
+    margin: 0 0 6px;
+    color: #0f9c9c;
+    font: 400 clamp(24px, 6vw, 38px)/1.15 "GFS Didot", serif;
+    text-align: center;
+    margin-bottom: 4rem;
 
     @media (max-width: 768px) {
         font-size: 2rem;
@@ -78,6 +77,8 @@
 }
 
 .card {
+    position: relative;
+    /* needed for the ::after positioning */
     background: #fff;
     border-radius: 1rem;
     padding: 1.25rem;
@@ -88,11 +89,29 @@
     gap: 1.25rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 
+    /* gradient overlay */
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        /* don’t block clicks */
+    }
+
     &:hover {
         transform: translateY(-5px);
         box-shadow: 0 40px 50px rgba(213, 219, 228, 0.5);
     }
+
+    &:hover::after {
+        opacity: 1;
+    }
 }
+
 
 .image {
     width: 100%;

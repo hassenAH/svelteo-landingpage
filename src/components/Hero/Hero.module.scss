@@ -70,14 +70,15 @@
 .frame {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 16 / 14;
+    /* more height than 16/10 */
     border-radius: 16px;
     background: #fff;
     box-shadow: 0 20px 60px rgba(15, 23, 42, .08);
     border: 1px solid rgba(0, 0, 0, .06);
     overflow: hidden;
-    /* ← more compatible than clip */
 }
+
 
 .slide {
     position: absolute;

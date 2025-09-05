@@ -28,11 +28,9 @@
 }
 
 .title {
-    font-family: "GFS Didot", serif;
-    color: #50bdc5;
-    font-size: 2.5rem;
-    font-weight: 400;
-    line-height: 1.2;
+    margin: 0 0 6px;
+    color: #0f9c9c;
+    font: 400 clamp(24px, 6vw, 38px)/1.15 "GFS Didot", serif;
     text-align: center;
     margin-bottom: 4rem;
 
@@ -41,7 +39,7 @@
     }
 
     @media (min-width: 1024px) {
-        font-size: 4rem;
+        font-size: 3rem;
     }
 }
 

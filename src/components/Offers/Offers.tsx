@@ -1,0 +1,128 @@
+import { MotionConfig, motion, type Variants } from "framer-motion";
+import styles from "./Offers.module.scss";
+
+type Offer = {
+    badge: string;
+    title: string;
+    lines: string[];
+    price: string;
+    featured?: boolean;
+    href?: string; // optional deep link for this specific offer
+};
+
+type OffersProps = {
+    id?: string;
+    offers?: Offer[];
+    reserveHref?: string;      // fallback booking link if offer.href is missing
+    reserveLabel?: string;     // text for the CTA button
+    note?: string;             // legal / fine print text under the grid
+};
+
+const container: Variants = {
+    hidden: { opacity: 0, y: 14 },
+    show: {
+        opacity: 1, y: 0,
+        transition: { duration: 0.45, ease: [0.22, 0.61, 0.36, 1], staggerChildren: 0.08, delayChildren: 0.05 }
+    }
+};
+
+const cardV: Variants = {
+    hidden: { opacity: 0, y: 16, scale: 0.98 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 220, damping: 22 } }
+};
+
+export default function Offers({
+    id = "offres",
+    reserveHref = "#reservation",
+    reserveLabel = "Réserver maintenant",
+    note = "Offres réservées aux nouveaux clients, places limitées. Prix TTC. Sveltéo Clinic Minceur – 14 Boulevard Risso, 06300 Nice.",
+    offers = [
+        {
+            badge: "Offre la plus choisie",
+            title: "Soin découverte minceur 40 min",
+            lines: ["Bilan morphologique offert – durée totale ~1h30"],
+            price: "29,90 €",
+            featured: true,
+        },
+        {
+            badge: "Point de départ",
+            title: "Bilan morphologique complet",
+            lines: ["Analyse corporelle, habitudes & objectifs – ~45 min"],
+            price: "19,90 €",
+        },
+    ],
+}: OffersProps) {
+    return (
+        <MotionConfig reducedMotion="user">
+            <section id={id} className={styles.section} aria-labelledby={`${id}-title`}>
+                <motion.div
+                    className={styles.inner}
+                    variants={container}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.35 }}
+                >
+                    <header className={styles.header}>
+                        <h2 id={`${id}-title`} className={styles.title}>Nos offres</h2>
+                        <p className={styles.subtitle}>
+                            Choisissez votre point d’entrée et démarrez sereinement votre programme personnalisé.
+                        </p>
+                    </header>
+
+                    <div className={styles.grid}>
+                        {offers.map((o, i) => {
+                            const link = o.href ?? `${reserveHref}?offer=${encodeURIComponent(o.title)}`;
+                            return (
+                                <motion.article
+                                    key={i}
+                                    className={`${styles.card} ${o.featured ? styles.featured : ""}`}
+                                    variants={cardV}
+                                    whileHover={{ y: -4, scale: 1.01 }}
+                                    transition={{ type: "spring", stiffness: 360, damping: 26 }}
+                                >
+                                    <div className={styles.cardBorder}>
+                                        <div className={styles.cardBody}>
+                                            <div className={styles.badgeRow}>
+                                                <span className={styles.badge}>{o.badge}</span>
+                                            </div>
+
+                                            <h3 className={styles.cardTitle}>{o.title}</h3>
+
+                                            <ul className={styles.list} role="list">
+                                                {o.lines.map((ln, idx) => (
+                                                    <li key={idx} className={styles.listItem}>
+                                                        <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true">
+                                                            <path d="M7.5 13.2l-3-3 1.4-1.4 1.6 1.6 4.6-4.6L13.5 7l-6 6.2z" fill="currentColor" />
+                                                        </svg>
+                                                        <span>{ln}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <div className={styles.priceRow} aria-label={`Prix ${o.price}`}>
+                                                <span className={styles.price}>{o.price}</span>
+                                            </div>
+
+                                            <motion.a
+                                                href={link}
+                                                className={styles.btnPrimary}
+                                                whileHover={{ y: -2, scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                                aria-label={`${reserveLabel} – ${o.title}`}
+                                            >
+                                                {reserveLabel}
+                                            </motion.a>
+                                        </div>
+                                    </div>
+                                </motion.article>
+                            );
+                        })}
+                    </div>
+
+                    <p className={styles.note}>{note}</p>
+                </motion.div>
+            </section>
+        </MotionConfig>
+    );
+}

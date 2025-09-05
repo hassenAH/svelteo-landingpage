@@ -31,31 +31,3 @@ body {
 .section {
     padding: clamp(64px, 10vw, 128px) 0;
 }
-
-.card {
-    background: $glass;
-    border: 1px solid rgba(255, 255, 255, .08);
-    border-radius: $radius;
-    box-shadow: $shadow;
-    backdrop-filter: blur(8px);
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: .6rem;
-    padding: .9rem 1.2rem;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    text-decoration: none;
-    background: linear-gradient(180deg,
-            $primary,
-            color.adjust($primary, $lightness: 10%));
-
-    color: #081018;
-    font-weight: 600;
-
-    &:hover {
-        transform: translateY(-2px);
-    }
-}

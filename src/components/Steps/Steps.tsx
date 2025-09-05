@@ -7,19 +7,19 @@ export default function Steps() {
             title: "Échange & réservation :",
             description: "Vous réservez en ligne ou par téléphone",
             image:
-                "https://api.builder.io/api/v1/image/assets/TEMP/130b56981a21dda9d361619262b87806a6143a2d?width=728",
+                "/images/Échange.webp",
         },
         {
             title: "Bilan & plan :",
             description: "Définition d'un protocole réaliste et motivant",
             image:
-                "https://api.builder.io/api/v1/image/assets/TEMP/aacef68fe1d6ea557df04823afc00f95a5aef23c?width=728",
+                "/images/Bilan.webp",
         },
         {
             title: "Suivi & résultats :",
             description: "Séances régulières et ajustements personnalisés",
             image:
-                "https://api.builder.io/api/v1/image/assets/TEMP/9e5c85156c6e1d1188ef5cb547b2c6c4f5e4dca2?width=728",
+                "/images/Suivi.webp",
         },
     ];
 

@@ -21,8 +21,8 @@ export default function Footer({
     clinicName = "Sveltéo Clinic Minceur",
     city = "Nice",
     address = "14 Boulevard Risso, 06300 Nice",
-    phone = "+91-88787878787",
-    email = "info@Suryanursinghome.com",
+    phone = "+33 4 83 93 47 37",
+    email = "Nice@svelteo.fr",
     icons = {
         mail: "/icons/mail.svg",
         facebook: "/icons/facebook.svg",
@@ -63,10 +63,10 @@ export default function Footer({
                     <a className={styles.socialBtn} href={`mailto:${email}`} aria-label="Email">
                         <img src={icons.mail} alt="" loading="lazy" />
                     </a>
-                    <a className={styles.socialBtn} href="#" aria-label="Facebook">
+                    <a className={styles.socialBtn} href="https://www.facebook.com/SvelteoNice?locale=fr_FR" aria-label="Facebook">
                         <img src={icons.facebook} alt="" loading="lazy" />
                     </a>
-                    <a className={styles.socialBtn} href="#" aria-label="Instagram">
+                    <a className={styles.socialBtn} href="https://www.instagram.com/svelteo_clinic_minceur_nice/" aria-label="Instagram">
                         <img src={icons.instagram} alt="" loading="lazy" />
                     </a>
                 </nav>

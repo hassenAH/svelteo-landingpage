@@ -34,7 +34,7 @@ export default function ReserveSession({
     // You asked for "nous appelez" — common UI phrasing is "Nous appeler".
     // Use either; you can change via prop:
     buttonLabel = "nous appelez",
-    phone = "+91-88787878787",
+    phone = "+33 4 83 93 47 37",
     note,
 }: ReserveSessionProps) {
     const telHref = `tel:${phone.replace(/[\s()-]/g, "")}`;
