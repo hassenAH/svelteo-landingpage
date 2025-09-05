@@ -12,6 +12,9 @@ import SocialFollow from "./components/SocialFollow/SocialFollow";
 import ReserveSession from "./components/ReserveSession/ReserveSession";
 import Hero from "./components/Hero/Hero";
 import Offers from "./components/Offers/Offers";
+import Reservation from "./components/Reservation/Formulaire/Reservation";
+
+
 
 export default function App() {
   return (
@@ -30,6 +33,8 @@ export default function App() {
           autoPlayMs={5000} // set 0 to disable
           cta={{ label: "Prendre rendez-vous", href: "#rendezvous" }}
         />
+        <Reservation />
+
       </Section>
       <Offers
         reserveHref="#reservation"              // or an external booking link

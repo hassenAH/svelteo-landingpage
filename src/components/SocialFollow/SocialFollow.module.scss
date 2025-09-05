@@ -1,6 +1,7 @@
 .section {
     width: 100%;
     padding: clamp(48px, 8vw, 96px) 0;
+    position: relative;
     background:
         radial-gradient(60% 50% at 50% 10%, #fff, transparent 70%),
 

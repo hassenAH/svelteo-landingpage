@@ -1,0 +1,213 @@
+/* Overlay covers full screen */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: radial-gradient(120% 100% at 50% 0%,
+            rgba(15, 17, 22, .55),
+            rgba(15, 17, 22, .48) 40%,
+            rgba(15, 17, 22, .42));
+    backdrop-filter: saturate(140%) blur(6px);
+    display: flex;
+    /* NEW: use flex to center */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Wrap (the modal card) */
+.wrap {
+    position: relative;
+    /* no longer fixed */
+    z-index: 91;
+
+    width: min(560px, 92%);
+    max-height: calc(100dvh - 48px);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+
+    border-radius: 20px;
+    padding: clamp(18px, 3.2vw, 26px);
+    display: grid;
+    gap: 12px;
+    grid-template-rows: auto auto auto auto;
+
+    border: 1px solid transparent;
+    background:
+        linear-gradient(#ffffff, #ffffff) padding-box,
+        linear-gradient(135deg, rgba(15, 156, 156, .35), rgba(122, 226, 226, .45)) border-box;
+    box-shadow:
+        0 30px 80px rgba(15, 23, 42, .18),
+        0 1px 0 rgba(255, 255, 255, .6) inset,
+        0 0 0 1px rgba(255, 255, 255, .5) inset;
+
+    pointer-events: auto;
+}
+
+/* You no longer need this, remove if present:
+.wrap { inset: 0; display: grid; place-items: center; pointer-events: none; }
+.wrap > * { pointer-events: auto; }
+*/
+
+/* (Optional) respect safe areas on tiny devices */
+@supports (padding: max(0px)) {
+    .wrap {
+        padding-bottom: max(clamp(12px, 3.2vw, 26px), env(safe-area-inset-bottom));
+    }
+}
+
+/* === Close button ===================================================== */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 156, 156, .22);
+    background: linear-gradient(180deg, rgba(15, 156, 156, .10), rgba(15, 156, 156, .06));
+    color: #0f9c9c;
+    font-size: 18px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, .12);
+    transition: transform .12s ease, background .2s ease, box-shadow .2s ease, border-color .2s ease;
+
+    &:hover {
+        background: rgba(15, 156, 156, .14);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, .16);
+    }
+
+    &:active {
+        transform: scale(.96);
+    }
+
+    &:focus-visible {
+        outline: 0;
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(15, 156, 156, .55);
+    }
+}
+
+/* === Check area ======================================================= */
+.checkWrap {
+    display: grid;
+    place-items: center;
+    margin: 2px 0 0;
+}
+
+.checkWrap svg {
+    filter: drop-shadow(0 10px 18px rgba(15, 23, 42, .16));
+}
+
+/* === Typography ======================================================= */
+.title {
+    margin: 4px 0 0;
+    text-align: center;
+    font-family: "GFS Didot", serif;
+    font-weight: 400;
+    font-size: clamp(22px, 5vw, 28px);
+    color: #0f9c9c;
+    letter-spacing: .2px;
+}
+
+.desc {
+    margin: 0;
+    text-align: center;
+    color: #3f4149;
+    font-family: "Poppins", system-ui, sans-serif;
+    font-size: clamp(.95rem, 2.8vw, 1rem);
+    line-height: 1.6;
+}
+
+/* === Actions / Buttons =============================================== */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.primary {
+    appearance: none;
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-radius: 12px;
+    padding: 11px 18px;
+    font: 600 .95rem/1 "Poppins", system-ui, sans-serif;
+    color: #fff;
+    background: linear-gradient(135deg, #0f9c9c, #12a3a3);
+    box-shadow:
+        0 10px 22px rgba(15, 156, 156, .26),
+        0 1px 0 rgba(255, 255, 255, .5) inset;
+    cursor: pointer;
+    transition: transform .08s ease, filter .2s ease, box-shadow .2s ease;
+
+    &:hover {
+        filter: brightness(1.03);
+        box-shadow:
+            0 12px 24px rgba(15, 156, 156, .32),
+            0 1px 0 rgba(255, 255, 255, .6) inset;
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 0;
+        box-shadow:
+            0 0 0 2px #fff,
+            0 0 0 4px rgba(15, 156, 156, .55),
+            0 10px 22px rgba(15, 156, 156, .26);
+    }
+}
+
+/* === Confetti (kept light; colors harmonized) ======================== */
+.confetti {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.confettiPiece {
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 12px;
+    border-radius: 3px;
+    background: #0f9c9c;
+    box-shadow: 0 8px 14px rgba(15, 23, 42, .2);
+}
+
+.confettiPiece:nth-child(3n) {
+    background: #7ae2e2;
+}
+
+.confettiPiece:nth-child(4n) {
+    background: #12a3a3;
+}
+
+/* === Auto-close progress bar ======================================== */
+.progress {
+    height: 3px;
+    border-radius: 2px;
+    margin-top: 4px;
+    background: linear-gradient(90deg, #7ae2e2, #0f9c9c);
+    transform-origin: left center;
+}
+
+/* === Motion-safety ==================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .overlay {
+        backdrop-filter: blur(3px);
+    }
+
+    .primary {
+        transition: none;
+    }
+
+    .close {
+        transition: none;
+    }
+}

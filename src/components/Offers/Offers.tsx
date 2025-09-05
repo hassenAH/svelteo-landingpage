@@ -49,7 +49,13 @@ export default function Offers({
             title: "Bilan morphologique complet",
             lines: ["Analyse corporelle, habitudes & objectifs – ~45 min"],
             price: "19,90 €",
-        },
+        }, {
+            badge: "Offre découverte",
+            title: "Séance découverte Cryolipolyse (1 zone)",
+            lines: ["Idéal pour tester la cryolipolyse – traitement ciblé par le froid pour réduire les graisses localisées (au lieu de 156 €)."],
+            price: "99,50 €",
+        }
+
     ],
 }: OffersProps) {
     return (

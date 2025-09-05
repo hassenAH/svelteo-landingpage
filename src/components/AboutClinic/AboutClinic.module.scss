@@ -16,6 +16,7 @@ $shadow-card: 0 15px 45px -5px rgba(0, 0, 0, 0.07);
     min-height: 100%;
     min-height: 100vh;
     min-height: 100svh;
+    position: relative;
     /* mobile address bar safe */
     display: flex;
     padding: clamp(24px, 4vw, 28px) clamp(24px, 6vw, 56px);

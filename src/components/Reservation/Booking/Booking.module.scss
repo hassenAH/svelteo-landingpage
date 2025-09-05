@@ -1,0 +1,173 @@
+.container {
+    /* REMOVE the old min-height:100vh + center flex */
+
+    border-radius: 16px;
+    padding: clamp(12px, 3vw, 24px);
+    display: grid;
+    gap: 1rem;
+    height: 100%;
+    /* match calendar height inside the grid row */
+    align-content: start;
+    /* content stacks from top */
+}
+
+.wrapper {
+    width: 100%;
+    max-width: none;
+    /* let it fill its grid cell */
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+}
+
+.title {
+    font-family: "GFS Didot", serif;
+    color: #77829d;
+    font-size: 1.125rem;
+
+    @media (min-width: 768px) {
+        font-size: 1.25rem;
+    }
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.field {
+    position: relative;
+}
+
+.inputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    height: 50px;
+    padding: 0.75rem 1.25rem;
+    background: #fafbfe;
+    border: 1px solid #f0f0f0;
+    border-radius: 0.5rem;
+
+    @media (max-width: 480px) {
+        height: 44px;
+        padding: 0.5rem 1rem;
+    }
+}
+
+.input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 0.875rem;
+    color: #000000;
+
+    &::placeholder {
+        color: #abb6c7;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 0.8rem;
+    }
+}
+
+.gdprHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.gdprTitle {
+    font-family: "Inria Serif", serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #77829d;
+}
+
+.required {
+    color: #e00808;
+}
+
+.gdprBox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    width: 100%; // make it fluid instead of fixed 374px
+
+    @media (min-width: 768px) {
+        width: 374px;
+    }
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    flex-wrap: wrap;
+}
+
+.checkbox {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000;
+
+    @media (max-width: 480px) {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+.checkboxText {
+    font-family: "Inria Serif", serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #000;
+
+    @media (max-width: 480px) {
+        font-size: 9px;
+    }
+}
+
+.gdprInfo {
+    font-family: "GFS Didot", serif;
+    font-size: 11px;
+    font-weight: 400;
+    color: #000;
+    line-height: 1.4;
+
+    @media (max-width: 480px) {
+        font-size: 10px;
+    }
+}
+
+.submitBtn {
+    margin-top: 1.5rem;
+    width: 100%;
+    background: #50bdc5;
+    color: #fff;
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background 0.3s ease;
+
+    &:hover {
+        background: #45a8b0;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 480px) {
+        padding: 0.6rem 1rem;
+        font-size: 0.875rem;
+    }
+}

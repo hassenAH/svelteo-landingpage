@@ -22,6 +22,7 @@ $bg: #ffffff;
     display: grid;
     grid-template-rows: auto 1px auto 1fr;
     gap: clamp(10px, 2.4vw, 16px);
+    height: 100%;
 }
 
 .header {
