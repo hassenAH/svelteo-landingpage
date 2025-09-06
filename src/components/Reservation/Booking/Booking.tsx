@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Booking.module.scss";
 
-// Booking.tsx (add prop)
 type BookingProps = {
     pickedDate: Date | null;
     onSuccess?: () => void;
@@ -16,16 +15,35 @@ type FormState = {
     acceptGDPR: boolean;
 };
 
-export default function Booking({ pickedDate, onSuccess }: BookingProps) {
+// helpers
+const toLocalNoon = (d: Date) =>
+    new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0, 0);
 
+// "YYYY-MM-DD" in local time (no timezone shift)
+const toLocalDateOnly = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+};
+
+export default function Booking({ pickedDate, onSuccess }: BookingProps) {
     const [formData, setFormData] = useState<FormState>({
-        pickedDate,
+        pickedDate: pickedDate ? toLocalNoon(pickedDate) : null,
         nom: "",
         prenom: "",
         telephone: "",
         email: "",
         acceptGDPR: false,
     });
+
+    // 🔧 keep formData.pickedDate in sync with prop
+    useEffect(() => {
+        setFormData((prev) => ({
+            ...prev,
+            pickedDate: pickedDate ? toLocalNoon(pickedDate) : null,
+        }));
+    }, [pickedDate]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -35,48 +53,60 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
         }));
     };
 
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        // basic guard
         if (!formData.acceptGDPR) return;
 
-        const pickedDateStr =
-            formData.pickedDate ? new Date(formData.pickedDate).toISOString() : "";
-        console.log(formData.pickedDate)
+        // ✅ send a stable date-only value
+        const pickedDateStr = formData.pickedDate
+            ? toLocalDateOnly(formData.pickedDate)
+            : "";
+
         const params = new URLSearchParams({
             nom: formData.nom,
             prenom: formData.prenom,
             telephone: formData.telephone,
             email: formData.email,
-            pickedDate: pickedDateStr,
+            pickedDate: pickedDateStr, // e.g. "2025-09-06"
             acceptGDPR: String(formData.acceptGDPR),
             page: window.location.pathname,
             ua: navigator.userAgent,
-            tz: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+            tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
         });
-        console.log(pickedDateStr);
-        try {
-            const resp = await fetch("https://script.google.com/macros/s/AKfycbxNbeSg94T18aAf7jvfNSulE6xLCpvTUE6aCEIdUxhLM-a71oIgG_vwBafU5Oix7RP5/exec", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-                body: params.toString(),
-                // mode: "cors" // default is fine; keep headers simple to avoid preflight
-            });
-            onSuccess?.();
-            // Apps Script often doesn't include CORS headers; avoid reading JSON if not needed
-            // If you DO want to inspect response JSON, you can try:
-            const data = await resp.json();
-            console.log(data)
 
-            // optionally reset:
-            setFormData(prev => ({ ...prev, nom: "", prenom: "", telephone: "", email: "" }));
+        try {
+            const resp = await fetch(
+                "https://script.google.com/macros/s/AKfycbw2NPqZWauuywmEa1RvT_3XD3B2-UpN9tPFThkg8irer2jGDqID_dX1QOkax6AGld4e/exec",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+                    body: params.toString(),
+                }
+            );
+
+            // Optional: if Apps Script lacks CORS, parsing JSON may fail.
+            // Wrap in try/catch if you want to read it.
+            try {
+                const data = await resp.json();
+                console.log("Apps Script response:", data);
+            } catch { }
+
+            onSuccess?.();
+
+            // optionally reset only text fields (keep picked date and GDPR choice)
+            setFormData((prev) => ({
+                ...prev,
+                nom: "",
+                prenom: "",
+                telephone: "",
+                email: "",
+            }));
         } catch (err) {
             console.error(err);
             alert("Oups, une erreur est survenue. Merci de réessayer.");
         }
     };
+
     return (
         <div className={styles.container}>
             <div className={styles.wrapper}>
@@ -88,7 +118,6 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                     {/* Nom */}
                     <div className={styles.field}>
                         <div className={styles.inputWrapper}>
-                            {/* ...your SVG... */}
                             <input
                                 type="text"
                                 name="nom"
@@ -104,7 +133,6 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                     {/* Prénom */}
                     <div className={styles.field}>
                         <div className={styles.inputWrapper}>
-                            {/* ...your SVG... */}
                             <input
                                 type="text"
                                 name="prenom"
@@ -120,7 +148,6 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                     {/* Téléphone */}
                     <div className={styles.field}>
                         <div className={styles.inputWrapper}>
-                            {/* ...your SVG... */}
                             <input
                                 type="tel"
                                 name="telephone"
@@ -136,7 +163,6 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                     {/* Email */}
                     <div className={styles.field}>
                         <div className={styles.inputWrapper}>
-                            {/* ...your SVG... */}
                             <input
                                 type="email"
                                 name="email"
@@ -149,10 +175,16 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                         </div>
                     </div>
 
-                    {/* (Optional) keep the picked date as a hidden field for debugging/backends */}
-                    {/* <input type="hidden" name="pickedDate" value={formData.pickedDate?.toISOString() ?? ""} /> */}
+                    {/* Optional: expose picked date read-only for UX/debug */}
+                    {/* <div className={styles.field}>
+            <input
+              type="text"
+              value={formData.pickedDate ? toLocalDateOnly(formData.pickedDate) : ""}
+              readOnly
+              className={styles.input}
+            />
+          </div> */}
 
-                    {/* GDPR Section + Agreement */}
                     <div className={styles.gdprHeader}>
                         <div className={styles.gdprTitle}>
                             <span className={styles.gdprText}>
@@ -180,12 +212,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                         </p>
                     </div>
 
-                    {/* Submit (inside the form) */}
-                    <button
-                        type="submit"
-                        disabled={!formData.acceptGDPR}
-                        className={styles.submitBtn}
-                    >
+                    <button type="submit" disabled={!formData.acceptGDPR} className={styles.submitBtn}>
                         Valider
                     </button>
                 </form>
@@ -193,4 +220,3 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
         </div>
     );
 }
-
