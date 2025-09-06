@@ -2,15 +2,10 @@ import { useMemo, useState } from "react";
 import styles from "./Calendar.module.scss";
 
 type CalendarProps = {
-    /** Preselect a date; controlled if you also pass onSelect */
     selectedDate?: Date | null;
-    /** Called when a day is chosen */
     onSelect?: (date: Date) => void;
-    /** Start from this month (default: current month) */
     initialDate?: Date;
-    /** Month labels (default: Swedish uppercase like your example) */
     monthNames?: string[];
-    /** Weekday labels, Monday first (default: Mon..Sun) */
     dayNames?: string[];
 };
 
@@ -19,18 +14,8 @@ export function Calendar({
     onSelect,
     initialDate,
     monthNames = [
-        "JANVIER",
-        "FÉVRIER",
-        "MARS",
-        "AVRIL",
-        "MAI",
-        "JUIN",
-        "JUILLET",
-        "AOÛT",
-        "SEPTEMBRE",
-        "OCTOBRE",
-        "NOVEMBRE",
-        "DÉCEMBRE",
+        "JANVIER", "FÉVRIER", "MARS", "AVRIL", "MAI", "JUIN",
+        "JUILLET", "AOÛT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DÉCEMBRE",
     ],
     dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
 }: CalendarProps) {
@@ -39,9 +24,14 @@ export function Calendar({
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
     }, []);
 
-    const [viewDate, setViewDate] = useState<Date>(
-        initialDate ? new Date(initialDate) : new Date(today)
-    );
+    // ✅ If initialDate is in the past, start from today’s month
+    const initialView = useMemo(() => {
+        if (!initialDate) return today;
+        const id = new Date(initialDate.getFullYear(), initialDate.getMonth(), initialDate.getDate());
+        return id < today ? today : id;
+    }, [initialDate, today]);
+
+    const [viewDate, setViewDate] = useState<Date>(initialView);
 
     const isSameDay = (a: Date, b: Date) =>
         a.getFullYear() === b.getFullYear() &&
@@ -52,24 +42,20 @@ export function Calendar({
     const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0);
     const daysInMonth = endOfMonth.getDate();
 
-    // Monday-first index: JS Sunday(0)…Saturday(6) → Monday(0)…Sunday(6)
+    // Monday-first
     const mondayFirstIdx = (startOfMonth.getDay() + 6) % 7;
 
-    // Build a 6×7 grid (42 cells) for consistent layout
-    const totalCells = 42;
+    // Can we go to previous month? (block months before current month)
+    // ✅ Only allow going to months >= today’s month (year,month comparison)
+    const canGoPrev =
+        viewDate.getFullYear() > today.getFullYear() ||
+        (viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() > today.getMonth());
+
     const cells = useMemo(() => {
-        const arr: {
-            date: Date;
-            inCurrentMonth: boolean;
-        }[] = [];
+        const arr: { date: Date; inCurrentMonth: boolean }[] = [];
+        const prevMonthLastDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), 0).getDate();
 
-        // Previous month's trailing days
-        const prevMonthLastDate = new Date(
-            viewDate.getFullYear(),
-            viewDate.getMonth(),
-            0
-        ).getDate();
-
+        // Prev month trailing
         for (let i = mondayFirstIdx - 1; i >= 0; i--) {
             const day = prevMonthLastDate - i;
             arr.push({
@@ -77,33 +63,34 @@ export function Calendar({
                 inCurrentMonth: false,
             });
         }
-
-        // Current month days
+        // Current month
         for (let d = 1; d <= daysInMonth; d++) {
             arr.push({
                 date: new Date(viewDate.getFullYear(), viewDate.getMonth(), d),
                 inCurrentMonth: true,
             });
         }
-
-        // Next month's leading days
+        // Next month leading
+        const totalCells = 42;
         for (let d = 1; arr.length < totalCells; d++) {
             arr.push({
                 date: new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, d),
                 inCurrentMonth: false,
             });
         }
-
         return arr;
     }, [viewDate, daysInMonth, mondayFirstIdx]);
 
     const navigateMonth = (dir: "prev" | "next") => {
+        if (dir === "prev" && !canGoPrev) return; // ✅ block navigating into past months
         const next = new Date(viewDate);
         next.setMonth(viewDate.getMonth() + (dir === "prev" ? -1 : 1));
         setViewDate(next);
     };
 
     const handleSelect = (date: Date) => {
+        // ✅ ignore past dates
+        if (date < today) return;
         onSelect?.(date);
     };
 
@@ -123,6 +110,7 @@ export function Calendar({
                         aria-label="Previous month"
                         onClick={() => navigateMonth("prev")}
                         className={styles.navBtn}
+                        disabled={!canGoPrev} // ✅ disable prev when viewing current month
                     >
                         <svg className={styles.chev} viewBox="0 0 8 12" aria-hidden="true">
                             <path d="M6.19 11.88L0.05 5.74 6.19 -0.4" stroke="currentColor" strokeWidth="1.3" fill="none" />
@@ -156,14 +144,16 @@ export function Calendar({
             <div className={styles.grid} role="grid" aria-readonly="true">
                 {cells.map(({ date, inCurrentMonth }, i) => {
                     const isToday = isSameDay(date, today);
-                    const isSelected =
-                        selectedDate != null && isSameDay(date, selectedDate);
+                    const isSelected = selectedDate != null && isSameDay(date, selectedDate);
 
+                    // ✅ disable any day before today
+                    const isPast = date < today;
                     const classNames = [
                         styles.cell,
                         !inCurrentMonth && styles.dim,
                         isToday && styles.today,
                         isSelected && styles.selected,
+                        isPast && styles.disabled, // optional: style for disabled past days
                     ]
                         .filter(Boolean)
                         .join(" ");
@@ -174,10 +164,11 @@ export function Calendar({
                             type="button"
                             role="gridcell"
                             aria-selected={!!isSelected}
+                            aria-disabled={isPast}
                             title={date.toDateString()}
                             className={classNames}
                             onClick={() => handleSelect(date)}
-                            disabled={!inCurrentMonth && !onSelect}
+                            disabled={isPast} // ✅ hard block selection
                         >
                             <span className={styles.dayNum}>{date.getDate()}</span>
                         </button>

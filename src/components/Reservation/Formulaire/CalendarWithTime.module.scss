@@ -1,25 +1,138 @@
+@use "sass:color";
+@use "styles/variables" as *;
+
 .wrap {
     display: grid;
-    gap: 12px;
+    gap: 10px;
+    position: relative;
+    max-width: 720px;
 }
 
-.timeArea {
-    animation: fadeIn .2s ease both;
+.label {
+    font: 600 14px/1.2 Inter, system-ui, sans-serif;
+    color: #444;
 }
 
-.summary {
-    margin-top: 8px;
-    font-size: .95rem;
+.row {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    gap: 10px;
+    align-items: center;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
+.time {
+    height: 44px;
+    min-width: 124px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 0 12px;
+    font: 600 14px/1 Inter, system-ui, sans-serif;
+    color: #222;
+    background: #fff;
+    transition: box-shadow .15s ease, transform .08s ease;
+
+
+    &:hover {
+        box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    &:focus-visible {
+        outline: 2px solid #0f9c9c;
+        outline-offset: 2px;
     }
+
+    // Remove browser-native time picker icons (WebKit)
+
+
+
+
+    // Optional: center text
+    text-align: center;
+    letter-spacing: .5px;
+
+    @media (min-width: 641px) {
+
+        &::-webkit-calendar-picker-indicator,
+        &::-webkit-inner-spin-button,
+        &::-webkit-clear-button {
+            display: none;
+        }
+
+        -moz-appearance: textfield;
+    }
+
+    // Mobile: KEEP the native picker (better UX)
+    @media (max-width: 640px) {
+        &::-webkit-calendar-picker-indicator {
+            display: initial;
+            opacity: 1;
+        }
+    }
+
+}
+
+
+.time {
+    @extend .trigger;
+    min-width: 124px;
+    text-align: center;
+}
+
+.trigger {
+    height: 44px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    transition: box-shadow .15s ease, transform .08s ease;
+
+    &:hover {
+        box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:focus-visible {
+        outline: 2px solid #0f9c9c;
+        outline-offset: 2px;
+    }
+}
+
+.triggerDate {
+    font: 600 14px/1 Inter, system-ui, sans-serif;
+    color: #222;
+}
+
+.calendarIcon {
+    width: 18px;
+    height: 18px;
+    color: #0f9c9c;
+}
+
+.time {
+    height: 44px;
+    min-width: 124px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    padding: 0 12px;
+    font: 600 14px/1 Inter, system-ui, sans-serif;
+}
+
+.popover {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 8px);
+    left: 0;
+    width: min(680px, 95vw);
+    box-shadow: 0 16px 50px rgba(0, 0, 0, .12), 0 2px 10px rgba(0, 0, 0, .06);
+    border-radius: 16px;
+    overflow: clip;
+    background: #fff;
 }

@@ -1,32 +1,30 @@
 import { useState } from "react";
-import Booking from "../Booking/Booking"
-import { Calendar } from "../Calendar/Calendar"
-import styles from "./Reservation.module.scss"
+import styles from "./Reservation.module.scss";
 import SuccessPopup from "../SuccessPopup/SuccessPopup";
 
+import Booking from "../Booking/Booking";
+import CalendarWithTime from "./CalendarWithTime";
 
 export default function Reservation() {
     const [successOpen, setSuccessOpen] = useState(false);
-    const [pickedDay, setPickedDay] = useState<Date | null>(null);
-    const handleDaySelect = (d: Date) => {
-        setPickedDay(d);
+    const [pickedDateTime, setPickedDateTime] = useState<Date | null>(null);
 
-    };
     return (
         <>
             <section className={styles.reservation}>
                 <div className={styles.calendar}>
-                    <Calendar
-                        initialDate={new Date()}
-                        selectedDate={pickedDay ?? undefined}
-                        onSelect={handleDaySelect}
+                    <CalendarWithTime
+                        value={pickedDateTime}
+                        onChange={setPickedDateTime}
+                        label="Sélectionnez la date et l'heure"
                     />
                 </div>
-                <div className={styles.booking}>
-                    <Booking pickedDate={pickedDay} onSuccess={() => setSuccessOpen(true)} />
-                </div>
 
+                <div className={styles.booking}>
+                    <Booking pickedDate={pickedDateTime} onSuccess={() => setSuccessOpen(true)} />
+                </div>
             </section>
+
             <SuccessPopup
                 open={successOpen}
                 onClose={() => setSuccessOpen(false)}

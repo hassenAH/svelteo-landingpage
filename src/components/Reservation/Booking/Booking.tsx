@@ -16,20 +16,19 @@ type FormState = {
 };
 
 // helpers
-const toLocalNoon = (d: Date) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0, 0);
+const pad = (n: number) => String(n).padStart(2, "0");
 
-// "YYYY-MM-DD" in local time (no timezone shift)
-const toLocalDateOnly = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-};
+// Local "YYYY-MM-DD HH:mm:ss" (no TZ shift)
+const toLocalDateOnly = (d: Date) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+const toLocalDateTime = (d: Date) =>
+    `${toLocalDateOnly(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
 export default function Booking({ pickedDate, onSuccess }: BookingProps) {
     const [formData, setFormData] = useState<FormState>({
-        pickedDate: pickedDate ? toLocalNoon(pickedDate) : null,
+        // ✅ keep the time from the prop; do NOT coerce to noon
+        pickedDate: pickedDate ?? null,
         nom: "",
         prenom: "",
         telephone: "",
@@ -37,11 +36,11 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
         acceptGDPR: false,
     });
 
-    // 🔧 keep formData.pickedDate in sync with prop
+    // ✅ keep in sync without altering time
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
-            pickedDate: pickedDate ? toLocalNoon(pickedDate) : null,
+            pickedDate: pickedDate ?? null,
         }));
     }, [pickedDate]);
 
@@ -57,17 +56,14 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
         e.preventDefault();
         if (!formData.acceptGDPR) return;
 
-        // ✅ send a stable date-only value
-        const pickedDateStr = formData.pickedDate
-            ? toLocalDateOnly(formData.pickedDate)
-            : "";
+        const pickedDateStr = formData.pickedDate ? toLocalDateTime(formData.pickedDate) : "";
 
         const params = new URLSearchParams({
             nom: formData.nom,
             prenom: formData.prenom,
             telephone: formData.telephone,
             email: formData.email,
-            pickedDate: pickedDateStr, // e.g. "2025-09-06"
+            pickedDate: pickedDateStr, // e.g. "2025-09-06 10:15:00"
             acceptGDPR: String(formData.acceptGDPR),
             page: window.location.pathname,
             ua: navigator.userAgent,
@@ -84,8 +80,6 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                 }
             );
 
-            // Optional: if Apps Script lacks CORS, parsing JSON may fail.
-            // Wrap in try/catch if you want to read it.
             try {
                 const data = await resp.json();
                 console.log("Apps Script response:", data);
@@ -93,7 +87,6 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
 
             onSuccess?.();
 
-            // optionally reset only text fields (keep picked date and GDPR choice)
             setFormData((prev) => ({
                 ...prev,
                 nom: "",
@@ -175,16 +168,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                         </div>
                     </div>
 
-                    {/* Optional: expose picked date read-only for UX/debug */}
-                    {/* <div className={styles.field}>
-            <input
-              type="text"
-              value={formData.pickedDate ? toLocalDateOnly(formData.pickedDate) : ""}
-              readOnly
-              className={styles.input}
-            />
-          </div> */}
-
+                    {/* GDPR */}
                     <div className={styles.gdprHeader}>
                         <div className={styles.gdprTitle}>
                             <span className={styles.gdprText}>
