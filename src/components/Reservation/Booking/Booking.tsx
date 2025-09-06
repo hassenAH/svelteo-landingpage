@@ -17,6 +17,7 @@ type FormState = {
 };
 
 export default function Booking({ pickedDate, onSuccess }: BookingProps) {
+
     const [formData, setFormData] = useState<FormState>({
         pickedDate,
         nom: "",
@@ -43,7 +44,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
 
         const pickedDateStr =
             formData.pickedDate ? new Date(formData.pickedDate).toISOString() : "";
-
+        console.log(formData.pickedDate)
         const params = new URLSearchParams({
             nom: formData.nom,
             prenom: formData.prenom,
@@ -55,7 +56,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
             ua: navigator.userAgent,
             tz: Intl.DateTimeFormat().resolvedOptions().timeZone || ""
         });
-
+        console.log(pickedDateStr);
         try {
             const resp = await fetch("https://script.google.com/macros/s/AKfycbxNbeSg94T18aAf7jvfNSulE6xLCpvTUE6aCEIdUxhLM-a71oIgG_vwBafU5Oix7RP5/exec", {
                 method: "POST",
