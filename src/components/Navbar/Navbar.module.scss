@@ -7,7 +7,7 @@
     width: 100%;
     padding: 0.5rem 1rem;
     position: relative;
-    /* background / shadow animated by Framer via inline styles/variants */
+
 
     &.isSticky {
         position: sticky;
@@ -168,10 +168,11 @@
     display: grid;
     gap: .75rem;
     padding: .9rem 1rem;
-    background: rgba(255, 255, 255, .96);
+    background: #fff;
     border-bottom: 1px solid rgba(0, 0, 0, .06);
     box-shadow: 0 20px 40px rgba(15, 23, 42, .08);
     backdrop-filter: blur(10px);
+    z-index: 91;
 
     a {
         text-decoration: none;

@@ -33,7 +33,7 @@ const cardV: Variants = {
 
 export default function Offers({
     id = "offres",
-    reserveHref = "#reservation",
+    reserveHref = "#rendezvous",
     reserveLabel = "Réserver maintenant",
     note = "Offres réservées aux nouveaux clients, places limitées. Prix TTC. Sveltéo Clinic Minceur – 14 Boulevard Risso, 06300 Nice.",
     offers = [
@@ -77,7 +77,7 @@ export default function Offers({
 
                     <div className={styles.grid}>
                         {offers.map((o, i) => {
-                            const link = o.href ?? `${reserveHref}?offer=${encodeURIComponent(o.title)}`;
+                            const link = o.href ?? `${reserveHref}`;
                             return (
                                 <motion.article
                                     key={i}

@@ -33,11 +33,12 @@ export default function App() {
           autoPlayMs={5000} // set 0 to disable
           cta={{ label: "Prendre rendez-vous", href: "#rendezvous" }}
         />
-        <Reservation />
+        <Section id="rendezvous" parallax={60} retrigger><Reservation /></Section>
+
 
       </Section>
       <Offers
-        reserveHref="#reservation"              // or an external booking link
+        reserveHref="#rendezvous"              // or an external booking link
         reserveLabel="Réserver maintenant"
       />
       <Section id="services" parallax={60} retrigger>

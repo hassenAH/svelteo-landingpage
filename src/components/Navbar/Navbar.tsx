@@ -5,8 +5,8 @@ import styles from "./Navbar.module.scss";
 const LINKS = [
     { label: "Rendez-vous", href: "#rendezvous" },
     { label: "Nos offres", href: "#offres" },
+    { label: "Découvrez-nous", href: "#about" },
     { label: "Prestations", href: "#services" },
-    { label: "Franchise", href: "#franchise" },
     { label: "Nous contacter", href: "#contact" },
 ];
 
@@ -113,7 +113,7 @@ export default function Navbar() {
                             <motion.a href="https://www.instagram.com/svelteo_clinic_minceur_nice/" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/instagram.svg" alt="Instagram" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="mailto:Nice@svelteo.fr" whileHover={{ y: -1, scale: 1.02 }}>
+                            <motion.a href="mailto:info@svelteo.com" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/email.svg" alt="Email" className={styles.svgIcon} />
                             </motion.a>
                         </li>
@@ -162,7 +162,7 @@ export default function Navbar() {
                             <motion.a href="https://www.instagram.com/svelteo_clinic_minceur_nice/" >
                                 <img src="/icons/instagram.svg" alt="Instagram" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="mailto:Nice@svelteo.fr" >
+                            <motion.a href="mailto:info@svelteo.com" >
                                 <img src="/icons/email.svg" alt="Email" className={styles.svgIcon} />
                             </motion.a>
                         </div>
