@@ -6,6 +6,14 @@ type BookingProps = {
     onSuccess?: () => void;
 };
 
+// 👇 Define your available offers here
+const OFFRES = [
+    "Soin découverte minceur 40 min",
+    "Bilan morphologique complet",
+    "Séance découverte Cryolipolyse (1 zone)",
+] as const;
+type Offre = (typeof OFFRES)[number] | "";
+
 type FormState = {
     pickedDate: Date | null;
     nom: string;
@@ -13,6 +21,7 @@ type FormState = {
     telephone: string;
     email: string;
     acceptGDPR: boolean;
+    offre: Offre;
 };
 
 // helpers
@@ -27,16 +36,16 @@ const toLocalDateTime = (d: Date) =>
 
 export default function Booking({ pickedDate, onSuccess }: BookingProps) {
     const [formData, setFormData] = useState<FormState>({
-        // ✅ keep the time from the prop; do NOT coerce to noon
         pickedDate: pickedDate ?? null,
         nom: "",
         prenom: "",
         telephone: "",
         email: "",
         acceptGDPR: false,
+        offre: "", // ✅ default empty
     });
 
-    // ✅ keep in sync without altering time
+    // keep in sync without altering time
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
@@ -44,13 +53,35 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
         }));
     }, [pickedDate]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
+    // Only allow string keys here to satisfy TS
+    type TextKeys = "nom" | "prenom" | "telephone" | "email" | "offre";
+
+    const onTextOrSelectChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const key = e.currentTarget.name as TextKeys;
+        const val =
+            key === "offre" ? (e.currentTarget.value as Offre) : e.currentTarget.value;
+        setFormData((p) => ({ ...p, [key]: val }));
     };
+
+    const onCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.currentTarget.checked;
+        setFormData(p => ({ ...p, acceptGDPR: checked }));
+    };
+
+
+    // Listen to "set-offre" global event from Offers grid
+    useEffect(() => {
+        const onSetOffre = (evt: Event) => {
+            const ce = evt as CustomEvent<string>;
+            const picked = (ce.detail ?? "") as Offre;
+            setFormData((prev) => ({ ...prev, offre: picked }));
+        };
+
+        window.addEventListener("set-offre", onSetOffre as EventListener);
+        return () => window.removeEventListener("set-offre", onSetOffre as EventListener);
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,7 +94,8 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
             prenom: formData.prenom,
             telephone: formData.telephone,
             email: formData.email,
-            pickedDate: pickedDateStr, // e.g. "2025-09-06 10:15:00"
+            offre: formData.offre || "Non précisé",
+            pickedDate: pickedDateStr,
             acceptGDPR: String(formData.acceptGDPR),
             page: window.location.pathname,
             ua: navigator.userAgent,
@@ -72,7 +104,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
 
         try {
             const resp = await fetch(
-                "https://script.google.com/macros/s/AKfycbw2NPqZWauuywmEa1RvT_3XD3B2-UpN9tPFThkg8irer2jGDqID_dX1QOkax6AGld4e/exec",
+                "https://script.google.com/macros/s/AKfycbxI9ag0YUWGc1FLDJdHYej3q0R89U-mhmMhXfiCY2wV5Ih8Qm8GT0RAfzuncuqU3g/exec",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
@@ -93,6 +125,8 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                 prenom: "",
                 telephone: "",
                 email: "",
+                offre: "",
+                acceptGDPR: false,
             }));
         } catch (err) {
             console.error(err);
@@ -101,13 +135,36 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} id="rendezvous">
             <div className={styles.wrapper}>
                 <h1 className={styles.title}>
                     Cures minceur personnalisées à Nice - Réservez votre séance découverte
                 </h1>
 
                 <form onSubmit={handleSubmit} className={styles.form} id="booking-form">
+                    {/* Offre */}
+                    <div className={styles.field}>
+                        <div className={styles.inputWrapper}>
+                            <select
+                                name="offre"
+                                value={formData.offre}
+                                onChange={onTextOrSelectChange}
+                                className={`${styles.input} ${styles.select}`}
+                                required
+                                aria-label="Choisissez une offre"
+                            >
+                                <option value="" disabled>
+                                    Choisir une offre
+                                </option>
+                                {OFFRES.map((o) => (
+                                    <option key={o} value={o}>
+                                        {o}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
                     {/* Nom */}
                     <div className={styles.field}>
                         <div className={styles.inputWrapper}>
@@ -115,7 +172,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                                 type="text"
                                 name="nom"
                                 value={formData.nom}
-                                onChange={handleInputChange}
+                                onChange={onTextOrSelectChange}
                                 placeholder="Nom"
                                 className={styles.input}
                                 required
@@ -130,7 +187,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                                 type="text"
                                 name="prenom"
                                 value={formData.prenom}
-                                onChange={handleInputChange}
+                                onChange={onTextOrSelectChange}
                                 placeholder="Prénom"
                                 className={styles.input}
                                 required
@@ -145,7 +202,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                                 type="tel"
                                 name="telephone"
                                 value={formData.telephone}
-                                onChange={handleInputChange}
+                                onChange={onTextOrSelectChange}
                                 placeholder="Téléphone"
                                 className={styles.input}
                                 required
@@ -160,7 +217,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                                 type="email"
                                 name="email"
                                 value={formData.email}
-                                onChange={handleInputChange}
+                                onChange={onTextOrSelectChange}
                                 placeholder="Email"
                                 className={styles.input}
                                 required
@@ -184,7 +241,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                                 type="checkbox"
                                 name="acceptGDPR"
                                 checked={formData.acceptGDPR}
-                                onChange={handleInputChange}
+                                onChange={onCheckboxChange}
                                 className={styles.checkbox}
                                 required
                             />

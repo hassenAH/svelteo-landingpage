@@ -20,62 +20,62 @@
     align-items: center;
 }
 
-.time {
-    height: 44px;
-    min-width: 124px;
-    border: 1px solid #dcdcdc;
-    border-radius: 12px;
-    padding: 0 12px;
-    font: 600 14px/1 Inter, system-ui, sans-serif;
-    color: #222;
-    background: #fff;
-    transition: box-shadow .15s ease, transform .08s ease;
-
-
-    &:hover {
-        box-shadow: 0 1px 0 rgba(0, 0, 0, .06);
-    }
-
-    &:focus-visible {
-        outline: 2px solid #0f9c9c;
-        outline-offset: 2px;
-    }
-
-    // Remove browser-native time picker icons (WebKit)
-
-
-
-
-    // Optional: center text
-    text-align: center;
-    letter-spacing: .5px;
-
-    @media (min-width: 641px) {
-
-        &::-webkit-calendar-picker-indicator,
-        &::-webkit-inner-spin-button,
-        &::-webkit-clear-button {
-            display: none;
-        }
-
-        -moz-appearance: textfield;
-    }
-
-    // Mobile: KEEP the native picker (better UX)
-    @media (max-width: 640px) {
-        &::-webkit-calendar-picker-indicator {
-            display: initial;
-            opacity: 1;
-        }
-    }
-
+/* container for time controls (used in JSX) */
+.timeRow {
+    /* desktop: sits in the second column via .row */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
+/* CalendarWithTime.module.scss (add) */
+.timeGroup {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
 
-.time {
-    @extend .trigger;
-    min-width: 124px;
-    text-align: center;
+.timeSelect {
+    appearance: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, .12);
+    background: #fff;
+    font: 500 0.95rem/1.2 Poppins, system-ui, sans-serif;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, .06);
+    color: #000;
+    -webkit-text-fill-color: #000;
+    /* iOS */
+}
+
+.timeSep {
+    opacity: .7;
+}
+
+.timeSelect option {
+    color: #000;
+    background: #fff;
+}
+
+.timeSelect:invalid {
+    color: #9aa1ac;
+}
+
+/* placeholder */
+.timeSelect:valid {
+    color: #000;
+}
+
+/* real value */
+
+.periodBadge {
+    margin-left: 8px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font: 600 0.8rem/1 Poppins, system-ui, sans-serif;
+    color: #0f9c9c;
+    background: #f2fbfb;
+    border: 1px solid rgba(15, 156, 156, .18);
 }
 
 .trigger {
@@ -135,4 +135,74 @@
     border-radius: 16px;
     overflow: clip;
     background: #fff;
+}
+
+/* =========================
+   MOBILE: time UNDER calendar
+   ========================= */
+@media (max-width: 520px) {
+
+    /* Use grid areas so we can reorder without touching JSX */
+    .wrap {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "label"
+            "trigger"
+            "popover"
+            "timerow";
+    }
+
+    .label {
+        grid-area: label;
+    }
+
+    /* let .trigger and .timeRow become direct grid items */
+    .row {
+        display: contents;
+    }
+
+    .trigger {
+        grid-area: trigger;
+    }
+
+    .timeRow {
+        grid-area: timerow;
+        justify-content: flex-start;
+        /* left-align under calendar */
+        margin-top: 8px;
+    }
+
+    /* Make calendar popover flow in the layout */
+    .popover {
+        position: static;
+        top: auto;
+        left: auto;
+        z-index: auto;
+        width: 100%;
+        margin-top: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .10);
+    }
+}
+
+.dayDisabled {
+    opacity: 0.45;
+    background: #fff;
+    cursor: not-allowed;
+
+    .dayNum {
+        color: $muted; // softer muted text color
+        font-weight: 600;
+    }
+
+    &:hover {
+        background: #fff; // no hover highlight
+    }
+
+    &:active {
+        transform: none; // prevent "press" animation
+    }
+
+    &:focus-visible {
+        outline: none; // avoid focus ring on disabled
+    }
 }

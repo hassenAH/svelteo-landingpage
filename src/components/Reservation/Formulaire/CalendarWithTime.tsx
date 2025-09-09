@@ -10,31 +10,42 @@ type CalendarWithTimeProps = {
     dayNames?: string[];
 };
 
-type HMS = { h: number; m: number; s?: number };
+type Period = "matin" | "apres";
 
-/** Native <input type="time"> always uses 24h "HH:MM" (seconds only if step < 60) */
-const TIME_RE = /^\d{2}:\d{2}$/;
+/* ---------------- helpers ---------------- */
 
 const toLocalDateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-
 const formatDateLabel = (d: Date | null) =>
     d
         ? d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
         : "Choisir une date";
 
-const formatTimeValue = (d: Date | null) => {
-    if (!d) return "";
-    const hh = String(d.getHours()).padStart(2, "0");
-    const mm = String(d.getMinutes()).padStart(2, "0");
-    return `${hh}:${mm}`;
+const isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6; // Sun=0, Sat=6
+const isMonday = (d: Date) => d.getDay() === 1;
+
+type Bounds = { min: number | null; max: number | null }; // hours in 24h, null = closed
+// Lundi: 12–19, Mar–Ven: 9–19, Sam/Dim: fermé
+const boundsFor = (d: Date | null): Bounds => {
+    if (!d) return { min: 9, max: 19 };
+    if (isWeekend(d)) return { min: null, max: null };
+    if (isMonday(d)) return { min: 12, max: 19 };
+    return { min: 9, max: 19 };
 };
 
-const parseTime = (val: string): HMS | null => {
-    if (!val || !TIME_RE.test(val)) return null;
-    const [hh, mm] = val.split(":").map(Number);
-    if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
-    return { h: Math.min(23, Math.max(0, hh)), m: Math.min(59, Math.max(0, mm)) };
+const fromH12 = (h12: number, p: Period) => (p === "apres" ? (h12 === 12 ? 12 : h12 + 12) : h12);
+const periodFrom24 = (h24: number): Period => (h24 < 12 ? "matin" : "apres");
+const toH12 = (h24: number, p: Period) => (p === "apres" ? (h24 === 12 ? 12 : h24 - 12) : h24);
+
+const clampToDayBounds = (d: Date | null, h24: number, m: number) => {
+    const { min, max } = boundsFor(d);
+    if (min == null || max == null) return { h24, m }; // closed day handled elsewhere
+    if (h24 < min) h24 = min;
+    if (h24 > max) h24 = max;
+    if (h24 === max && m > 0) m = 0; // closing hour → only :00
+    return { h24, m };
 };
+
+/* ---------------- component ---------------- */
 
 export default function CalendarWithTime({
     value = null,
@@ -45,20 +56,48 @@ export default function CalendarWithTime({
 }: CalendarWithTimeProps) {
     const [open, setOpen] = useState(false);
 
-    // Keep local states but avoid churn/jumpiness
+    // date-only selection
     const [pickedDateOnly, setPickedDateOnly] = useState<Date | null>(value ? toLocalDateOnly(value) : null);
-    const [timeStr, setTimeStr] = useState<string>(formatTimeValue(value));
-    const [timeHMS, setTimeHMS] = useState<HMS | null>(() => parseTime(formatTimeValue(value)));
+
+    // time controls (12h + period)
+    const initH24 = value ? value.getHours() : 9;
+    const initMins = value ? value.getMinutes() : 0;
+    const initPeriod = periodFrom24(initH24);
+    const [period, setPeriod] = useState<Period>(initPeriod);
+    const [hour12, setHour12] = useState<number>(toH12(initH24, initPeriod));
+    const [mins, setMins] = useState<number>(initMins);
 
     const popRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
-    const timeRef = useRef<HTMLInputElement | null>(null);
+    const hourRef = useRef<HTMLSelectElement | null>(null);
 
-    // Sync from parent value, but only if it actually changed (prevents cursor jump while typing)
+    // which period(s) are allowed for the currently picked day
+    const allowedPeriods: Period[] = useMemo(() => {
+        if (!pickedDateOnly) return ["matin", "apres"];
+        if (isWeekend(pickedDateOnly)) return []; // closed
+        if (isMonday(pickedDateOnly)) return ["apres"]; // hide "matin" on Monday
+        return ["matin", "apres"];
+    }, [pickedDateOnly]);
+
+    // ensure selected period is valid for the day (e.g., switch to 'apres' on Monday)
+    useEffect(() => {
+        if (!pickedDateOnly) return;
+        if (!allowedPeriods.includes(period)) {
+            const fallback = allowedPeriods[0] ?? "apres";
+            setPeriod(fallback);
+            // also snap hour to the day's opening hour
+            const { min } = boundsFor(pickedDateOnly);
+            if (min != null) {
+                const pr = periodFrom24(min);
+                setHour12(toH12(min, pr));
+                setMins(0);
+            }
+        }
+    }, [pickedDateOnly, allowedPeriods, period]);
+
+    // sync from parent value (without jumpiness)
     useEffect(() => {
         const nextDateOnly = value ? toLocalDateOnly(value) : null;
-        const nextTimeStr = formatTimeValue(value);
-
         const sameDate =
             (pickedDateOnly === null && nextDateOnly === null) ||
             (pickedDateOnly &&
@@ -67,37 +106,50 @@ export default function CalendarWithTime({
                 pickedDateOnly.getMonth() === nextDateOnly.getMonth() &&
                 pickedDateOnly.getDate() === nextDateOnly.getDate());
 
-        const sameTime = timeStr === nextTimeStr;
-
         if (!sameDate) setPickedDateOnly(nextDateOnly);
-        if (!sameTime) {
-            setTimeStr(nextTimeStr);
-            setTimeHMS(parseTime(nextTimeStr));
+
+        if (value) {
+            const h24 = value.getHours();
+            const m = value.getMinutes();
+            const pr = periodFrom24(h24);
+            setPeriod(pr);
+            setHour12(toH12(h24, pr));
+            setMins(m);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [value]);
+    }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Accept time only when valid (so typing "09:" doesn’t explode state)
+    // if the selected day changes, ensure current time fits that day's bounds
     useEffect(() => {
-        const hms = parseTime(timeStr);
-        if (hms) setTimeHMS(hms);
-    }, [timeStr]);
+        if (!pickedDateOnly) return;
+        const prevH24 = fromH12(hour12, period);
+        const prevM = mins;
+        const { h24, m } = clampToDayBounds(pickedDateOnly, prevH24, prevM);
+        if (h24 !== prevH24 || m !== prevM) {
+            const pr = periodFrom24(h24);
+            setPeriod(pr);
+            setHour12(toH12(h24, pr));
+            setMins(m);
+        }
+    }, [pickedDateOnly]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Build combined datetime only when both parts are valid
+    // build combined value
     const combined = useMemo(() => {
-        if (!pickedDateOnly || !timeHMS) return null;
+        if (!pickedDateOnly) return null;
+        const { min, max } = boundsFor(pickedDateOnly);
+        if (min == null || max == null) return null; // closed day
+        const { h24, m } = clampToDayBounds(pickedDateOnly, fromH12(hour12, period), mins);
         return new Date(
             pickedDateOnly.getFullYear(),
             pickedDateOnly.getMonth(),
             pickedDateOnly.getDate(),
-            timeHMS.h,
-            timeHMS.m,
+            h24,
+            m,
             0,
             0
         );
-    }, [pickedDateOnly, timeHMS]);
+    }, [pickedDateOnly, hour12, mins, period]);
 
-    // Emit to parent only when actual combined value changes
+    // emit to parent only when actual combined value changes
     const lastEmittedRef = useRef<number | null>(null);
     useEffect(() => {
         const cur = combined ? combined.getTime() : null;
@@ -107,10 +159,9 @@ export default function CalendarWithTime({
         }
     }, [combined, onChange]);
 
-    // Close popover on outside click / ESC (robust against clicking the trigger)
+    // close popover on outside click / ESC
     useEffect(() => {
         if (!open) return;
-
         const onPointerDown = (e: PointerEvent) => {
             const t = e.target as Node;
             const insidePop = !!popRef.current && popRef.current.contains(t);
@@ -120,7 +171,6 @@ export default function CalendarWithTime({
         const onEsc = (e: KeyboardEvent) => {
             if (e.key === "Escape") setOpen(false);
         };
-
         document.addEventListener("pointerdown", onPointerDown);
         document.addEventListener("keydown", onEsc);
         return () => {
@@ -129,23 +179,44 @@ export default function CalendarWithTime({
         };
     }, [open]);
 
+    // choose a day
     const onDayPicked = (d: Date) => {
-        // Assume Calendar already gives a local date-only (or at least local day)
-        setPickedDateOnly(toLocalDateOnly(d));
+        if (isWeekend(d)) return; // closed
+        const local = toLocalDateOnly(d);
+        setPickedDateOnly(local);
         setOpen(false);
-
-        // If no valid time yet, set a sensible default
-        if (!timeHMS) {
-            setTimeStr("10:00");
-            setTimeHMS({ h: 10, m: 0 });
+        // snap to opening time for this day
+        const { min } = boundsFor(local);
+        if (min != null) {
+            const pr = periodFrom24(min);
+            setPeriod(pr);
+            setHour12(toH12(min, pr));
+            setMins(0);
         }
+        requestAnimationFrame(() => hourRef.current?.focus());
+    };
 
-        // Focus time input next tick
-        requestAnimationFrame(() => {
-            timeRef.current?.focus();
-            // Safari doesn’t support select() on type=time; this is safe to call anyway
-            timeRef.current?.select?.();
-        });
+    // options + disabled logic
+    const MATIN_12 = [9, 10, 11];
+    const APRES_12 = [12, 1, 2, 3, 4, 5, 6, 7]; // 12 → 19
+
+    const dayBounds = boundsFor(pickedDateOnly);
+    const dayClosed = dayBounds.min == null || dayBounds.max == null;
+
+    const hourDisabled = (h12Opt: number, p: Period) => {
+        const { min, max } = dayBounds;
+        if (min == null || max == null) return true;
+        const h24 = fromH12(h12Opt, p);
+        return h24 < min || h24 > max;
+    };
+
+    const minuteDisabled = (mOpt: number) => {
+        const { min, max } = dayBounds;
+        if (min == null || max == null) return true;
+        const h24 = fromH12(hour12, period);
+        if (h24 < min || h24 > max) return true;
+        if (h24 === max) return mOpt !== 0; // closing hour: only :00
+        return false;
     };
 
     return (
@@ -153,7 +224,7 @@ export default function CalendarWithTime({
             <label className={styles.label}>{label}</label>
 
             <div className={styles.row}>
-                {/* Trigger that shows current date and opens the popover */}
+                {/* Trigger showing current date */}
                 <button
                     ref={triggerRef}
                     type="button"
@@ -168,31 +239,56 @@ export default function CalendarWithTime({
                     </svg>
                 </button>
 
-                {/* Time input */}
-                <input
-                    ref={timeRef}
-                    type="time"
-                    className={styles.time}
-                    value={timeStr}
-                    onChange={(e) => setTimeStr(e.target.value)}
-                    onBlur={(e) => {
-                        const hms = parseTime(e.target.value);
-                        if (hms) {
-                            const hh = String(hms.h).padStart(2, "0");
-                            const mm = String(hms.m).padStart(2, "0");
-                            setTimeStr(`${hh}:${mm}`);
-                        }
-                    }}
-                    aria-label="Heure"
-                    inputMode="numeric"
-                    min="08:00"
-                    max="20:00"
-                    step={60 * 15} // 15-minute steps
-                    lang="fr-FR"
-                />
+                {/* Time controls */}
+                <div className={styles.timeRow}>
+                    <div className={styles.timeGroup} aria-label="Heure">
+                        <select
+                            ref={hourRef}
+                            className={styles.timeSelect}
+                            value={hour12}
+                            onChange={(e) => setHour12(Number(e.target.value))}
+                            aria-label="Heure"
+                            disabled={dayClosed}
+                        >
+                            {(period === "matin" ? MATIN_12 : APRES_12).map((h) => (
+                                <option key={h} value={h} disabled={hourDisabled(h, period)}>
+                                    {h}
+                                </option>
+                            ))}
+                        </select>
+
+                        <span className={styles.timeSep}>:</span>
+
+                        <select
+                            className={styles.timeSelect}
+                            value={mins}
+                            onChange={(e) => setMins(Number(e.target.value))}
+                            aria-label="Minutes"
+                            disabled={dayClosed}
+                        >
+                            {[0, 15, 30, 45].map((m) => (
+                                <option key={m} value={m} disabled={minuteDisabled(m)}>
+                                    {String(m).padStart(2, "0")}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Period: hide "Matin" entirely on Monday */}
+                        <select
+                            className={styles.timeSelect}
+                            value={period}
+                            onChange={(e) => setPeriod(e.target.value as Period)}
+                            aria-label="Période"
+                            disabled={dayClosed}
+                        >
+                            {allowedPeriods.includes("matin") && <option value="matin">Matin</option>}
+                            {allowedPeriods.includes("apres") && <option value="apres">Après-midi</option>}
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            {/* Popover with the existing Calendar component */}
+            {/* Popover with Calendar */}
             {open && (
                 <div ref={popRef} role="dialog" aria-label="Sélecteur de date" className={styles.popover}>
                     <Calendar
@@ -201,6 +297,10 @@ export default function CalendarWithTime({
                         onSelect={onDayPicked}
                         monthNames={monthNames}
                         dayNames={dayNames}
+
+                        isDateDisabled={(d: Date) => isWeekend(d)}
+                        getDayClassName={(d: Date) => (isWeekend(d) ? styles.dayDisabled : "")}
+
                     />
                 </div>
             )}

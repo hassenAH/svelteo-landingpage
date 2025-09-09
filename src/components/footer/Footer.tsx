@@ -17,7 +17,7 @@ type FooterProps = {
 };
 
 export default function Footer({
-    logoSrc = "/logo-svelteo.webp",
+    logoSrc = "/whitelogo.png",
     clinicName = "Sveltéo Clinic Minceur",
     city = "Nice",
     address = "14 Boulevard Risso, 06300 Nice",

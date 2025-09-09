@@ -1,6 +1,6 @@
 .section {
     width: 100%;
-    padding: clamp(48px, 8vw, 96px) 0;
+    padding: clamp(20px, 8vw, 96px) 0;
     position: relative;
     background:
         radial-gradient(60% 50% at 50% 10%, #fff, transparent 70%),
@@ -45,12 +45,14 @@
 .grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: clamp(12px, 3vw, 24px);
-    justify-items: center; // center items horizontally
+    gap: clamp(10px, 3vw, 24px);
+    justify-content: center; // ✅ center the whole grid
+    justify-items: center; // ✅ center cards inside their cells
 
     @media (min-width: 520px) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        justify-items: stretch; // stretch on larger screens
+        justify-content: center; // ✅ keep grid centered
+        justify-items: stretch; // ✅ stretch cards evenly
     }
 
     @media (min-width: 880px) {
@@ -58,8 +60,16 @@
     }
 }
 
+
 .card {
     list-style: none;
+    width: 100%; // ✅ take full width inside the grid
+    justify-self: center;
+
+    @media (min-width: 520px) {
+        justify-self: center;
+        width: auto; // ✅ let grid control sizing on tablet+
+    }
 }
 
 .btn {

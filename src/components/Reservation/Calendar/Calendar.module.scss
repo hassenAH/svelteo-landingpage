@@ -171,3 +171,26 @@ $bg: #ffffff;
     max-width: 720px;
     margin: 0 auto;
 }
+
+.disabled {
+    opacity: 0.45;
+    background: #fff;
+    cursor: not-allowed;
+
+    .dayNum {
+        color: $muted; // softer muted text color
+        font-weight: 600;
+    }
+
+    &:hover {
+        background: #fff; // no hover highlight
+    }
+
+    &:active {
+        transform: none; // prevent "press" animation
+    }
+
+    &:focus-visible {
+        outline: none; // avoid focus ring on disabled
+    }
+}

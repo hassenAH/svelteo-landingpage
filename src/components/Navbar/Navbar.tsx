@@ -113,7 +113,7 @@ export default function Navbar() {
                             <motion.a href="https://www.instagram.com/svelteo_clinic_minceur_nice/" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/instagram.svg" alt="Instagram" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="mailto:info@svelteo.com" whileHover={{ y: -1, scale: 1.02 }}>
+                            <motion.a href="mailto:info@svelteo.fr" whileHover={{ y: -1, scale: 1.02 }}>
                                 <img src="/icons/email.svg" alt="Email" className={styles.svgIcon} />
                             </motion.a>
                         </li>
@@ -162,7 +162,7 @@ export default function Navbar() {
                             <motion.a href="https://www.instagram.com/svelteo_clinic_minceur_nice/" >
                                 <img src="/icons/instagram.svg" alt="Instagram" className={styles.svgIcon} />
                             </motion.a>
-                            <motion.a href="mailto:info@svelteo.com" >
+                            <motion.a href="mailto:info@svelteo.fr" >
                                 <img src="/icons/email.svg" alt="Email" className={styles.svgIcon} />
                             </motion.a>
                         </div>

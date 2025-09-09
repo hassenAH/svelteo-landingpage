@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./Calendar.module.scss";
 
 type CalendarProps = {
@@ -7,6 +7,12 @@ type CalendarProps = {
     initialDate?: Date;
     monthNames?: string[];
     dayNames?: string[];
+
+    /** Optional: disable specific days (in addition to past days) */
+    isDateDisabled?: (d: Date) => boolean;
+
+    /** Optional: return an extra className for a day cell */
+    getDayClassName?: (d: Date) => string | undefined | null;
 };
 
 export function Calendar({
@@ -18,13 +24,15 @@ export function Calendar({
         "JUILLET", "AOÛT", "SEPTEMBRE", "OCTOBRE", "NOVEMBRE", "DÉCEMBRE",
     ],
     dayNames = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+    isDateDisabled,
+    getDayClassName,
 }: CalendarProps) {
     const today = useMemo(() => {
         const d = new Date();
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
     }, []);
 
-    // ✅ If initialDate is in the past, start from today’s month
+    // If initialDate is in the past, start from today’s month
     const initialView = useMemo(() => {
         if (!initialDate) return today;
         const id = new Date(initialDate.getFullYear(), initialDate.getMonth(), initialDate.getDate());
@@ -38,6 +46,13 @@ export function Calendar({
         a.getMonth() === b.getMonth() &&
         a.getDate() === b.getDate();
 
+    // Jump view when controlled selection changes (optional but useful)
+    useEffect(() => {
+        if (selectedDate) {
+            setViewDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
+        }
+    }, [selectedDate]);
+
     const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
     const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0);
     const daysInMonth = endOfMonth.getDate();
@@ -45,8 +60,7 @@ export function Calendar({
     // Monday-first
     const mondayFirstIdx = (startOfMonth.getDay() + 6) % 7;
 
-    // Can we go to previous month? (block months before current month)
-    // ✅ Only allow going to months >= today’s month (year,month comparison)
+    // Only allow going to months >= today’s month (year,month comparison)
     const canGoPrev =
         viewDate.getFullYear() > today.getFullYear() ||
         (viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() > today.getMonth());
@@ -82,15 +96,14 @@ export function Calendar({
     }, [viewDate, daysInMonth, mondayFirstIdx]);
 
     const navigateMonth = (dir: "prev" | "next") => {
-        if (dir === "prev" && !canGoPrev) return; // ✅ block navigating into past months
+        if (dir === "prev" && !canGoPrev) return;
         const next = new Date(viewDate);
         next.setMonth(viewDate.getMonth() + (dir === "prev" ? -1 : 1));
         setViewDate(next);
     };
 
-    const handleSelect = (date: Date) => {
-        // ✅ ignore past dates
-        if (date < today) return;
+    const handleSelect = (date: Date, disabled: boolean) => {
+        if (disabled) return;
         onSelect?.(date);
     };
 
@@ -110,7 +123,7 @@ export function Calendar({
                         aria-label="Previous month"
                         onClick={() => navigateMonth("prev")}
                         className={styles.navBtn}
-                        disabled={!canGoPrev} // ✅ disable prev when viewing current month
+                        disabled={!canGoPrev}
                     >
                         <svg className={styles.chev} viewBox="0 0 8 12" aria-hidden="true">
                             <path d="M6.19 11.88L0.05 5.74 6.19 -0.4" stroke="currentColor" strokeWidth="1.3" fill="none" />
@@ -146,14 +159,19 @@ export function Calendar({
                     const isToday = isSameDay(date, today);
                     const isSelected = selectedDate != null && isSameDay(date, selectedDate);
 
-                    // ✅ disable any day before today
+                    // base rules
                     const isPast = date < today;
+                    const isCustomDisabled = !!isDateDisabled?.(date);
+                    const disabled = isPast || isCustomDisabled;
+
+                    const extraClass = getDayClassName?.(date);
                     const classNames = [
                         styles.cell,
                         !inCurrentMonth && styles.dim,
                         isToday && styles.today,
                         isSelected && styles.selected,
-                        isPast && styles.disabled, // optional: style for disabled past days
+                        disabled && styles.disabled,
+                        extraClass, // allow user-supplied per-day class
                     ]
                         .filter(Boolean)
                         .join(" ");
@@ -164,11 +182,11 @@ export function Calendar({
                             type="button"
                             role="gridcell"
                             aria-selected={!!isSelected}
-                            aria-disabled={isPast}
+                            aria-disabled={disabled}
                             title={date.toDateString()}
                             className={classNames}
-                            onClick={() => handleSelect(date)}
-                            disabled={isPast} // ✅ hard block selection
+                            onClick={() => handleSelect(date, disabled)}
+                            disabled={disabled}
                         >
                             <span className={styles.dayNum}>{date.getDate()}</span>
                         </button>
@@ -178,3 +196,9 @@ export function Calendar({
         </section>
     );
 }
+
+/** Example helpers you can use where you render <Calendar/> */
+export const isWeekend = (d: Date) => {
+    const day = d.getDay(); // 0 Sun ... 6 Sat
+    return day === 0 || day === 6;
+};

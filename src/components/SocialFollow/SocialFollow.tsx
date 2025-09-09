@@ -34,7 +34,7 @@ export default function SocialFollow({
     links = [
         { label: "Facebook", href: "https://facebook.com", iconSrc: "/icons/facebook.svg" },
         { label: "Instagram", href: "https://instagram.com", iconSrc: "/icons/instagram.svg" },
-        { label: "Email", href: "mailto:info@svelteo.com", iconSrc: "/icons/email.svg", aria: "Envoyer un e-mail" },
+        { label: "Email", href: "mailto:info@svelteo.fr", iconSrc: "/icons/email.svg", aria: "Envoyer un e-mail" },
         // add more if needed
     ],
 }: SocialFollowProps) {

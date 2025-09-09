@@ -28,7 +28,7 @@ export default function AboutClinic() {
         <div className={styles.page}>
             <div className={styles.container}>
                 <h1 className={styles.title}>
-                    À Propos Sveltéo Clinique Minceur Nice
+                    À Propos Sveltéo clinic Minceur Nice
                 </h1>
                 <br />
                 <br />
