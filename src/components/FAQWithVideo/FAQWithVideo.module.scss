@@ -1,0 +1,192 @@
+.section {
+    width: 100%;
+    padding: clamp(32px, 8vw, 96px) 0;
+    background: radial-gradient(60% 50% at 50% 10%, #fff, transparent 70%);
+}
+
+.inner {
+    width: min(1120px, 92%);
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: clamp(20px, 4vw, 36px);
+}
+
+.title {
+    margin: 0 0 6px;
+    color: #0f9c9c;
+    font: 400 clamp(24px, 6vw, 38px)/1.15 "GFS Didot", serif;
+    text-align: center;
+    margin-bottom: 4rem;
+
+    @media (max-width: 768px) {
+        font-size: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 3rem;
+    }
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 4vw, 32px);
+
+    @media (min-width: 980px) {
+        grid-template-columns: 1.05fr 0.95fr;
+        /* video a bit wider */
+        align-items: start;
+        gap: clamp(24px, 3vw, 40px);
+    }
+}
+
+.videoCol {
+    min-width: 0;
+}
+
+.faqCol {
+    min-width: 0;
+    display: grid;
+    gap: clamp(12px, 3vw, 16px);
+}
+
+/* Sticky video on desktop for better UX */
+@media (min-width: 1200px) {
+    .videoCol {
+
+        top: 96px;
+    }
+}
+
+/* Video card */
+.player {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.07);
+    transition: transform .25s ease, box-shadow .25s ease;
+    aspect-ratio: 14/9;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
+    }
+}
+
+.iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.item {
+    position: relative;
+    background: #fff;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(120deg, rgba(15, 156, 156, 0), rgba(15, 156, 156, .35), rgba(15, 156, 156, 0));
+        /* masks (webkit + standard) */
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+
+        opacity: 0;
+        transition: opacity .25s ease;
+
+        pointer-events: none;
+        /* ✅ don’t block clicks */
+    }
+}
+
+
+.itemOpen::before,
+.item:hover::before {
+    opacity: .9;
+}
+
+/* Trigger */
+.trigger {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: clamp(14px, 3vw, 18px);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+
+    font-family: "Poppins", sans-serif;
+    font-size: clamp(15px, 3.5vw, 16px);
+    font-weight: 600;
+    color: #2a2d33;
+
+    &:hover {
+        color: #0f9c9c;
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(15, 156, 156, .25);
+        border-radius: 10px;
+    }
+}
+
+.q {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.dot {
+    width: .55rem;
+    height: .55rem;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 30%, #0f9c9c, #0aa);
+}
+
+.chev {
+    width: 18px;
+    height: 18px;
+    transition: transform .2s ease;
+}
+
+.open .chev {
+    transform: rotate(180deg);
+}
+
+.panel {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    overflow: hidden;
+    /* ✅ needed for max-height animation */
+    transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
+}
+
+.panelOpen {
+    max-height: 480px;
+    /* bump if answers are longer */
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.answer {
+    padding: 0 1rem 1rem 1rem;
+    font-family: "Poppins", sans-serif;
+    color: #5b6886;
+    font-size: 0.98rem;
+    line-height: 1.65;
+}

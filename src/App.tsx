@@ -13,8 +13,28 @@ import ReserveSession from "./components/ReserveSession/ReserveSession";
 import Hero from "./components/Hero/Hero";
 import Offers from "./components/Offers/Offers";
 import Reservation from "./components/Reservation/Formulaire/Reservation";
+import FAQWithVideo from "./components/FAQWithVideo/FAQWithVideo";
 
 
+
+const faqItems = [
+  {
+    question: "Comment la Cryo peut vous aider à obtenir un ventre plat ?",
+    answer: "La cryolipolyse cible les graisses localisées grâce au froid, qui détruit les cellules adipeuses pour une élimination naturelle et progressive par le corps. Ce traitement de remodelage corporel permet de réduire les amas graisseux qui résistent au sport et aux régimes."
+  },
+  {
+    question: "Quels sont les effets de la Slim Scan sur la cellulite ?",
+    answer: "Grâce à son action directe sur les cellules graisseuses, la Slim Scan réduit visiblement l'aspect 'peau d'orange' de la cellulite et tonifie la peau. Cette méthode sûre et indolore est une alternative non-chirurgicale pour remodeler votre silhouette."
+  },
+  {
+    question: "Quels sont les effets de la presso-esthétique pour une silhouette affinée ?",
+    answer: "La presso-esthétique est une méthode esthétique qui contribue à une meilleure circulation lymphatique et veineuse. On l’utilise pour drainer les fluides corporels, éliminer les toxines et tonifier le corps."
+  },
+  {
+    question: "Comment perdre le tablier du ventre sans chirurgie ?",
+    answer: "Pour perdre du ventre sans chirurgie, concentrez-vous d'abord sur l'alimentation : privilégiez les protéines maigres, les fruits et légumes, et limitez les plats préparés ainsi que les aliments sucrés. Une alimentation saine et un contrôle des portions sont les clés pour réduire la graisse abdominale."
+  },
+];
 
 export default function App() {
   return (
@@ -52,8 +72,16 @@ export default function App() {
       <Section id="steps" parallax={50} retrigger>
         <Steps />
       </Section>
+      <Section id="FAQ" parallax={50} retrigger>
+        <FAQWithVideo
+          videoId="7Wf3dgfkTKE"
+          items={faqItems}
+          title="Questions fréquemment posées"
+          allowMultiple={false} // set true if you prefer multiple open
+        />
+      </Section>
 
-      <Section id="steps" parallax={50} retrigger>
+      <Section id="ReserveSession" parallax={50} retrigger>
         <ReserveSession
           // optional: customize
           buttonLabel="Nous appeler" // or "nous appelez" to match your copy
@@ -61,6 +89,7 @@ export default function App() {
           note="Disponible du lundi au samedi, 9h–19h."
         />
       </Section>
+
 
       <Section id="SocialFollow" parallax={50} retrigger>
         <SocialFollow
