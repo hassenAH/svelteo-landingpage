@@ -104,7 +104,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
 
         try {
             const resp = await fetch(
-                "https://script.google.com/macros/s/AKfycbxI9ag0YUWGc1FLDJdHYej3q0R89U-mhmMhXfiCY2wV5Ih8Qm8GT0RAfzuncuqU3g/exec",
+                "https://script.google.com/macros/s/AKfycbx1MiLAPoLayvsQixXkYc6nbXzu2o9rFIuyAAQElwiLmf7vjorILxqVRn65jvfuZDYX/exec",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
