@@ -32,6 +32,12 @@ const boundsFor = (d: Date | null): Bounds => {
     return { min: 9, max: 19 };
 };
 
+// Add near your helpers
+const formatHourLabel = (h12: number, p: Period) => {
+    const h = p === "apres" ? fromH12(h12, "apres") : h12; // 1→13, 2→14, ..., 7→19
+    return String(h).padStart(2, "0"); // "09", "13", "19"
+};
+
 const fromH12 = (h12: number, p: Period) => (p === "apres" ? (h12 === 12 ? 12 : h12 + 12) : h12);
 const periodFrom24 = (h24: number): Period => (h24 < 12 ? "matin" : "apres");
 const toH12 = (h24: number, p: Period) => (p === "apres" ? (h24 === 12 ? 12 : h24 - 12) : h24);
@@ -252,10 +258,11 @@ export default function CalendarWithTime({
                         >
                             {(period === "matin" ? MATIN_12 : APRES_12).map((h) => (
                                 <option key={h} value={h} disabled={hourDisabled(h, period)}>
-                                    {h}
+                                    {formatHourLabel(h, period)}   {/* shows 09,10,11 or 12,13,14...19 */}
                                 </option>
                             ))}
                         </select>
+
 
                         <span className={styles.timeSep}>:</span>
 
