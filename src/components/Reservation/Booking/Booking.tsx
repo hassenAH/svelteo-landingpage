@@ -35,6 +35,9 @@ const toLocalDateTime = (d: Date) =>
     `${toLocalDateOnly(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 
 export default function Booking({ pickedDate, onSuccess }: BookingProps) {
+
+    // 🔥 NEW: submitting flag
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState<FormState>({
         pickedDate: pickedDate ?? null,
         nom: "",
@@ -86,7 +89,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.acceptGDPR) return;
-
+        setIsSubmitting(true);
         const pickedDateStr = formData.pickedDate ? toLocalDateTime(formData.pickedDate) : "";
 
         const params = new URLSearchParams({
@@ -118,6 +121,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
             } catch { }
 
             onSuccess?.();
+            setIsSubmitting(false);
 
             setFormData((prev) => ({
                 ...prev,
@@ -130,6 +134,7 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
             }));
         } catch (err) {
             console.error(err);
+            setIsSubmitting(false);
             alert("Oups, une erreur est survenue. Merci de réessayer.");
         }
     };
@@ -253,8 +258,22 @@ export default function Booking({ pickedDate, onSuccess }: BookingProps) {
                         </p>
                     </div>
 
-                    <button type="submit" disabled={!formData.acceptGDPR} className={styles.submitBtn}>
-                        Valider
+
+                    {/* 🔥 Loading button */}
+                    <button
+                        type="submit"
+                        disabled={!formData.acceptGDPR || isSubmitting}
+                        className={styles.submitBtn}
+                        aria-busy={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <span className={styles.spinner} />
+                                <span>Envoi…</span>
+                            </>
+                        ) : (
+                            "Valider"
+                        )}
                     </button>
                 </form>
             </div>

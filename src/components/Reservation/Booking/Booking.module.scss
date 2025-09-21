@@ -158,6 +158,31 @@
     }
 }
 
+/* 🔥 Loading state support */
+.spinner {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    color: #000;
+    opacity: 0.8;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+
 .submitBtn {
     margin-top: 1.5rem;
     width: 100%;

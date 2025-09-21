@@ -20,15 +20,41 @@ const formatDateLabel = (d: Date | null) =>
         ? d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
         : "Choisir une date";
 
-const isWeekend = (d: Date) => d.getDay() === 0 || d.getDay() === 6; // Sun=0, Sat=6
+// Helpers to check day of week
+const isWeekend = (d: Date) => {
+    const day = d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+    return day === 0 || day === 6;
+};
+
 const isMonday = (d: Date) => d.getDay() === 1;
 
-type Bounds = { min: number | null; max: number | null }; // hours in 24h, null = closed
-// Lundi: 12–19, Mar–Ven: 9–19, Sam/Dim: fermé
+// 🔥 Check if date falls inside the blocked range
+const isInDisabledRange = (d: Date) => {
+    const start = new Date(2025, 8, 22); // months are 0-based → 8 = September
+    const end = new Date(2025, 8, 26);
+
+    // Normalize to date-only (ignore time part)
+    const dd = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return dd >= start && dd <= end;
+};
+
+type Bounds = {
+    min: number | null; // hours in 24h, null = closed
+    max: number | null;
+};
+
+// Opening hours:
+// - Monday: 12–19
+// - Tuesday–Friday: 9–19
+// - Saturday/Sunday: closed
+// - Disabled range: closed
 const boundsFor = (d: Date | null): Bounds => {
     if (!d) return { min: 9, max: 19 };
+
     if (isWeekend(d)) return { min: null, max: null };
+    if (isInDisabledRange(d)) return { min: null, max: null };
     if (isMonday(d)) return { min: 12, max: 19 };
+
     return { min: 9, max: 19 };
 };
 
@@ -305,10 +331,12 @@ export default function CalendarWithTime({
                         monthNames={monthNames}
                         dayNames={dayNames}
 
-                        isDateDisabled={(d: Date) => isWeekend(d)}
-                        getDayClassName={(d: Date) => (isWeekend(d) ? styles.dayDisabled : "")}
-
+                        isDateDisabled={(d: Date) => isWeekend(d) || isInDisabledRange(d)}
+                        getDayClassName={(d: Date) =>
+                            isWeekend(d) || isInDisabledRange(d) ? styles.dayDisabled : ""
+                        }
                     />
+
                 </div>
             )}
         </div>
