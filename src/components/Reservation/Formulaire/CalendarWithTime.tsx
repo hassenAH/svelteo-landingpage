@@ -20,6 +20,22 @@ const formatDateLabel = (d: Date | null) =>
         ? d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
         : "Choisir une date";
 
+const ymd = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+type WindowHM = { start: [number, number]; end: [number, number] }; // [hour24, minute]
+
+const SPECIAL_WINDOWS: Record<string, WindowHM> = {
+    "2025-09-23": { start: [14, 0], end: [19, 0] }, // 14:00 → 19:00
+    "2025-09-24": { start: [15, 30], end: [19, 0] }, // 15:30 → 19:00
+    "2025-09-25": { start: [15, 30], end: [19, 0] }, // 15:30 → 19:00
+    "2025-09-26": { start: [10, 30], end: [12, 30] }, // 10:30 → 12:30
+};
+
+const getSpecialWindow = (d: Date | null): WindowHM | null => {
+    if (!d) return null;
+    return SPECIAL_WINDOWS[ymd(d)] ?? null;
+};
 // Helpers to check day of week
 const isWeekend = (d: Date) => {
     const day = d.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
@@ -51,11 +67,43 @@ type Bounds = {
 const boundsFor = (d: Date | null): Bounds => {
     if (!d) return { min: 9, max: 19 };
 
+    // If a special window exists, use its hour envelope
+    const w = getSpecialWindow(d);
+    if (w) return { min: w.start[0], max: w.end[0] };
+
     if (isWeekend(d)) return { min: null, max: null };
     if (isInDisabledRange(d)) return { min: null, max: null };
     if (isMonday(d)) return { min: 12, max: 19 };
 
     return { min: 9, max: 19 };
+};
+const isMinuteAllowedFor = (d: Date | null, h24: number, m: number) => {
+    const w = getSpecialWindow(d);
+    if (!w) {
+        // default rules: if closing hour, only :00
+        const { min, max } = boundsFor(d);
+        if (min == null || max == null) return false;
+        if (h24 < min || h24 > max) return false;
+        if (h24 === max) return m === 0;
+        return true;
+    }
+
+    const [sh, sm] = w.start;
+    const [eh, em] = w.end;
+
+    // Before start hour
+    if (h24 < sh) return false;
+    // After end hour
+    if (h24 > eh) return false;
+
+    // On start hour: minutes must be >= start minutes
+    if (h24 === sh && m < sm) return false;
+
+    // On end hour: minutes must be <= end minutes
+    if (h24 === eh && m > em) return false;
+
+    // Between hours is fine
+    return true;
 };
 
 // Add near your helpers
@@ -68,12 +116,31 @@ const fromH12 = (h12: number, p: Period) => (p === "apres" ? (h12 === 12 ? 12 : 
 const periodFrom24 = (h24: number): Period => (h24 < 12 ? "matin" : "apres");
 const toH12 = (h24: number, p: Period) => (p === "apres" ? (h24 === 12 ? 12 : h24 - 12) : h24);
 
-const clampToDayBounds = (d: Date | null, h24: number, m: number) => {
+const clampToDayBounds = (d: Date | null, h24In: number, mIn: number) => {
+    let h24 = h24In;
+    let m = mIn;
+
+    const w = getSpecialWindow(d);
+    if (w) {
+        const [sh, sm] = w.start;
+        const [eh, em] = w.end;
+
+        // Clamp hour first
+        if (h24 < sh) { h24 = sh; m = sm; }
+        else if (h24 > eh) { h24 = eh; m = em; }
+        else {
+            // Inside hour range → clamp minutes to window edges if needed
+            if (h24 === sh && m < sm) m = sm;
+            if (h24 === eh && m > em) m = em;
+        }
+        return { h24, m };
+    }
+
     const { min, max } = boundsFor(d);
-    if (min == null || max == null) return { h24, m }; // closed day handled elsewhere
-    if (h24 < min) h24 = min;
-    if (h24 > max) h24 = max;
-    if (h24 === max && m > 0) m = 0; // closing hour → only :00
+    if (min == null || max == null) return { h24, m };
+    if (h24 < min) { h24 = min; m = 0; }
+    if (h24 > max) { h24 = max; m = 0; }
+    if (h24 === max && m > 0) m = 0;
     return { h24, m };
 };
 
@@ -102,30 +169,61 @@ export default function CalendarWithTime({
     const popRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const hourRef = useRef<HTMLSelectElement | null>(null);
+    /* ---- Period availability helpers ---- */
+
+    // Minutes grid the UI offers
+    const MINUTE_STEPS = [0, 15, 30, 45];
+
+    const hourRangeForDay = (d: Date | null): [number, number] | null => {
+        if (!d) return [9, 19];
+        const w = getSpecialWindow(d);
+        if (w) return [w.start[0], w.end[0]];
+        const { min, max } = boundsFor(d);
+        if (min == null || max == null) return null;
+        return [min, max];
+    };
+
+    const hasAnySlot = (d: Date | null, p: Period): boolean => {
+        const range = hourRangeForDay(d);
+        if (!range) return false;
+        const [hMin, hMax] = range;
+
+        // Period partition: Matin < 12, Après >= 12
+        const inPeriod = (h: number) => (p === "matin" ? h < 12 : h >= 12);
+
+        for (let h = hMin; h <= hMax; h++) {
+            if (!inPeriod(h)) continue;
+            for (const m of MINUTE_STEPS) {
+                if (isMinuteAllowedFor(d, h, m)) return true;
+            }
+        }
+        return false;
+    };
 
     // which period(s) are allowed for the currently picked day
     const allowedPeriods: Period[] = useMemo(() => {
-        if (!pickedDateOnly) return ["matin", "apres"];
-        if (isWeekend(pickedDateOnly)) return []; // closed
-        if (isMonday(pickedDateOnly)) return ["apres"]; // hide "matin" on Monday
-        return ["matin", "apres"];
-    }, [pickedDateOnly]);
+        if (!pickedDateOnly) return ["matin", "apres"]; // neutral before picking
+        const range = hourRangeForDay(pickedDateOnly);
+        if (!range) return []; // closed day
 
+        const list: Period[] = [];
+        if (hasAnySlot(pickedDateOnly, "matin")) list.push("matin");
+        if (hasAnySlot(pickedDateOnly, "apres")) list.push("apres");
+        return list;
+    }, [pickedDateOnly]);
     // ensure selected period is valid for the day (e.g., switch to 'apres' on Monday)
     useEffect(() => {
         if (!pickedDateOnly) return;
         if (!allowedPeriods.includes(period)) {
-            const fallback = allowedPeriods[0] ?? "apres";
-            setPeriod(fallback);
-            // also snap hour to the day's opening hour
-            const { min } = boundsFor(pickedDateOnly);
-            if (min != null) {
-                const pr = periodFrom24(min);
-                setHour12(toH12(min, pr));
-                setMins(0);
+            const fallback = allowedPeriods[0];
+            if (fallback) {
+                setPeriod(fallback);
+                // snap to the earliest valid slot of that day
+                snapToDayStart(pickedDateOnly);
             }
         }
     }, [pickedDateOnly, allowedPeriods, period]);
+
 
     // sync from parent value (without jumpiness)
     useEffect(() => {
@@ -210,21 +308,20 @@ export default function CalendarWithTime({
             document.removeEventListener("keydown", onEsc);
         };
     }, [open]);
-
-    // choose a day
+    const isDateDisabledExceptSpecial = (d: Date) => {
+        // If a special window exists, the date should be selectable even if it’s in the blocked range
+        if (getSpecialWindow(d)) return false;
+        return isWeekend(d) || isInDisabledRange(d);
+    };
     const onDayPicked = (d: Date) => {
-        if (isWeekend(d)) return; // closed
+        if (isDateDisabledExceptSpecial(d)) return; // keep weekend/range logic but allow specials
         const local = toLocalDateOnly(d);
         setPickedDateOnly(local);
         setOpen(false);
-        // snap to opening time for this day
-        const { min } = boundsFor(local);
-        if (min != null) {
-            const pr = periodFrom24(min);
-            setPeriod(pr);
-            setHour12(toH12(min, pr));
-            setMins(0);
-        }
+
+        // ⬅️ Reset to FIRST available time for that day
+        snapToDayStart(local);
+
         requestAnimationFrame(() => hourRef.current?.focus());
     };
 
@@ -236,21 +333,42 @@ export default function CalendarWithTime({
     const dayClosed = dayBounds.min == null || dayBounds.max == null;
 
     const hourDisabled = (h12Opt: number, p: Period) => {
-        const { min, max } = dayBounds;
-        if (min == null || max == null) return true;
         const h24 = fromH12(h12Opt, p);
+        const { min, max } = dayBounds;
+        const w = getSpecialWindow(pickedDateOnly);
+
+        if (w) {
+            const [sh] = w.start;
+            const [eh] = w.end;
+            return h24 < sh || h24 > eh;
+        }
+
+        if (min == null || max == null) return true;
         return h24 < min || h24 > max;
     };
 
     const minuteDisabled = (mOpt: number) => {
-        const { min, max } = dayBounds;
-        if (min == null || max == null) return true;
         const h24 = fromH12(hour12, period);
-        if (h24 < min || h24 > max) return true;
-        if (h24 === max) return mOpt !== 0; // closing hour: only :00
-        return false;
+        return !isMinuteAllowedFor(pickedDateOnly, h24, mOpt);
     };
-
+    const snapToDayStart = (d: Date) => {
+        const w = getSpecialWindow(d); // from the previous snippet
+        if (w) {
+            const [sh, sm] = w.start;           // e.g., 15:30
+            const pr = periodFrom24(sh);
+            setPeriod(pr);
+            setHour12(toH12(sh, pr));
+            setMins(sm);
+            return;
+        }
+        const { min } = boundsFor(d);
+        if (min != null) {
+            const pr = periodFrom24(min);
+            setPeriod(pr);
+            setHour12(toH12(min, pr));
+            setMins(0);
+        }
+    };
     return (
         <div className={styles.wrap}>
             <label className={styles.label}>{label}</label>
@@ -331,9 +449,9 @@ export default function CalendarWithTime({
                         monthNames={monthNames}
                         dayNames={dayNames}
 
-                        isDateDisabled={(d: Date) => isWeekend(d) || isInDisabledRange(d)}
+                        isDateDisabled={(d: Date) => isWeekend(d)}
                         getDayClassName={(d: Date) =>
-                            isWeekend(d) || isInDisabledRange(d) ? styles.dayDisabled : ""
+                            isWeekend(d) ? styles.dayDisabled : ""
                         }
                     />
 
