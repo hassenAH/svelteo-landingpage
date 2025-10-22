@@ -26,7 +26,7 @@ const swipeConfidenceThreshold = 6_000; // framer demo-style heuristic
 
 export default function Hero({
     title = "Retrouvez votre silhouette en toute sérénité",
-    description = `Sveltéo Clinic Minceur accompagne femmes et hommes avec des protocoles sur mesure : cryolipolyse, soins manuels amincissants, tunnel infrarouge & soins détox, coaching alimentaire et bilan morphologique. Un cadre chic, un suivi sérieux, des résultats concrets.`,
+    description = `Sveltéo Clinic Minceur accompagne femmes et hommes avec des protocoles sur mesure : cryolipolyse, pressothérapie, tunnel infrarouge & soins détox, coaching alimentaire et bilan morphologique. Un cadre chic, un suivi sérieux, des résultats concrets.`,
     slides = DEFAULT_SLIDES,
     autoPlayMs = 5000,
     fit = "cover",

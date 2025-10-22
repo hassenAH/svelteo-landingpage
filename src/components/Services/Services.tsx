@@ -19,7 +19,7 @@ export default function Services() {
                 "/images/Cryolipolyse.webp",
         },
         {
-            title: "Soins manuels amincissants",
+            title: "Pressothérapie",
             image:
                 "/images/Soins.webp",
         },
